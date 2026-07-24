@@ -9,5 +9,8 @@
         <module name="UNIThesis" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="model" target="25" />
+    </bytecodeTargetLevel>
   </component>
 </project>

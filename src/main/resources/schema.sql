@@ -56,3 +56,20 @@ CREATE TABLE revisioni_capitoli (
                                     stato_revisione VARCHAR(50) NOT NULL DEFAULT 'IN_REVISIONE',
                                     data_invio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS corsi_di_laurea (
+                                               id SERIAL PRIMARY KEY,
+                                               nome VARCHAR(100) NOT NULL UNIQUE,
+    dipartimento VARCHAR(100) NOT NULL
+    );
+
+CREATE TABLE IF NOT EXISTS richieste_tesi (
+                                              id SERIAL PRIMARY KEY,
+                                              id_studente INT NOT NULL,
+                                              id_tesi INT NOT NULL,
+                                              stato VARCHAR(20) DEFAULT 'IN_ATTESA',
+    data_richiesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    motivazione TEXT,
+    CONSTRAINT fk_studente FOREIGN KEY (id_studente) REFERENCES studenti(id_utente) ON DELETE CASCADE,
+    CONSTRAINT fk_tesi FOREIGN KEY (id_tesi) REFERENCES tesi(id) ON DELETE CASCADE
+    );

@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS richieste_tesi CASCADE;
+DROP TABLE IF EXISTS corsi_di_laurea CASCADE;
 DROP TABLE IF EXISTS revisioni_capitoli CASCADE;
 DROP TABLE IF EXISTS candidature CASCADE;
 DROP TABLE IF EXISTS tesi CASCADE;
@@ -57,19 +59,19 @@ CREATE TABLE revisioni_capitoli (
                                     data_invio TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS corsi_di_laurea (
-                                               id SERIAL PRIMARY KEY,
-                                               nome VARCHAR(100) NOT NULL UNIQUE,
-    dipartimento VARCHAR(100) NOT NULL
-    );
+CREATE TABLE corsi_di_laurea (
+                                 id SERIAL PRIMARY KEY,
+                                 nome VARCHAR(100) NOT NULL UNIQUE,
+                                 dipartimento VARCHAR(100) NOT NULL
+);
 
-CREATE TABLE IF NOT EXISTS richieste_tesi (
-                                              id SERIAL PRIMARY KEY,
-                                              id_studente INT NOT NULL,
-                                              id_tesi INT NOT NULL,
-                                              stato VARCHAR(20) DEFAULT 'IN_ATTESA',
-    data_richiesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    motivazione TEXT,
-    CONSTRAINT fk_studente FOREIGN KEY (id_studente) REFERENCES studenti(id_utente) ON DELETE CASCADE,
-    CONSTRAINT fk_tesi FOREIGN KEY (id_tesi) REFERENCES tesi(id) ON DELETE CASCADE
-    );
+CREATE TABLE richieste_tesi (
+                                id SERIAL PRIMARY KEY,
+                                id_studente INT NOT NULL,
+                                id_tesi INT NOT NULL,
+                                stato VARCHAR(20) DEFAULT 'IN_ATTESA',
+                                data_richiesta TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                motivazione TEXT,
+                                CONSTRAINT fk_studente FOREIGN KEY (id_studente) REFERENCES studenti(id_utente) ON DELETE CASCADE,
+                                CONSTRAINT fk_tesi FOREIGN KEY (id_tesi) REFERENCES tesi(id_tesi) ON DELETE CASCADE
+);

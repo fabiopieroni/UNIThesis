@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS candidature CASCADE;
 DROP TABLE IF EXISTS tesi CASCADE;
 DROP TABLE IF EXISTS professori CASCADE;
 DROP TABLE IF EXISTS studenti CASCADE;
+DROP TABLE IF EXISTS notifiche CASCADE;
 DROP TABLE IF EXISTS utenti CASCADE;
 
 CREATE TABLE utenti (
@@ -74,4 +75,12 @@ CREATE TABLE richieste_tesi (
                                 motivazione TEXT,
                                 CONSTRAINT fk_studente FOREIGN KEY (id_studente) REFERENCES studenti(id_utente) ON DELETE CASCADE,
                                 CONSTRAINT fk_tesi FOREIGN KEY (id_tesi) REFERENCES tesi(id_tesi) ON DELETE CASCADE
+);
+
+CREATE TABLE notifiche (
+                           id_notifica SERIAL PRIMARY KEY,
+                           id_utente INT NOT NULL REFERENCES utenti(id_utente) ON DELETE CASCADE,
+                           messaggio TEXT NOT NULL,
+                           data_invio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           letta BOOLEAN DEFAULT FALSE
 );

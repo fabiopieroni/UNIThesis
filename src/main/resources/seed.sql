@@ -1,19 +1,21 @@
--- 1. Disabilita temporaneamente i vincoli o pulisci (opzionale)
--- Se vuoi che lo script sia rieseguibile senza errori di duplicati
+-- ==========================================
+-- DATI DI PROVA PER IL TEST
+-- ==========================================
 
--- 2. Dati di base (es. Dipartimenti / Corsi di Laurea)
-INSERT INTO dipartimento (id, nome) VALUES
-                                        (1, 'Informatica'),
-                                        (2, 'Ingegneria dell''Informazione'),
-                                        (3, 'Economia');
+-- 1. Studente
+INSERT INTO utenti (email, password, ruolo, nome, cognome)
+VALUES ('mario.rossi@studenti.it', 'password123', 'STUDENTE', 'Mario', 'Rossi');
 
--- 3. Utenti di prova (Professori e Studenti)
-INSERT INTO utente (id, nome, cognome, email, password, ruolo) VALUES
-                                                                   (1, 'Mario', 'Rossi', 'mario.rossi@unithesis.it', 'password123', 'PROFESSORE'),
-                                                                   (2, 'Elena', 'Bianchi', 'elena.bianchi@unithesis.it', 'password123', 'PROFESSORE'),
-                                                                   (3, 'Luigi', 'Verdi', 'luigi.verdi@studenti.unithesis.it', 'password123', 'STUDENTE');
+INSERT INTO studenti (id_utente, matricola, cfu_totali, corso_laurea)
+VALUES (currval('utenti_id_utente_seq'), '123456', 120, 'Informatica');
 
--- 4. Tesi / Proposte di Tesi di prova
-INSERT INTO tesi (id, titolo, descrizione, relatore_id, dipartimento_id, stato) VALUES
-                                                                                    (1, 'Sviluppo di un''applicazione JavaFX con Architettura DAO', 'Progetto incentrato su Java, JDBC e pattern DAO.', 1, 1, 'DISPONIBILE'),
-                                                                                    (2, 'Analisi dei Big Data in ambiente Cloud', 'Studio comparativo su AWS e Azure.', 2, 2, 'DISPONIBILE');
+-- 2. Professore
+INSERT INTO utenti (email, password, ruolo, nome, cognome)
+VALUES ('luigi.verdi@unifi.it', 'prof123', 'PROFESSORE', 'Luigi', 'Verdi');
+
+INSERT INTO professori (id_utente, matricola_docente, corso_laurea, num_tesisti_attivi)
+VALUES (currval('utenti_id_utente_seq'), 'DOC999', 'Informatica', 2);
+
+-- 3. Segreteria
+INSERT INTO utenti (email, password, ruolo, nome, cognome)
+VALUES ('segreteria@unifi.it', 'admin123', 'SEGRETERIA', 'Anna', 'Bianchi');

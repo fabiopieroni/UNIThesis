@@ -1,5 +1,7 @@
 package model;
 
+import business.state.*;
+
 public class Tesi {
   private int idTesi;
   private String titolo;
@@ -7,11 +9,12 @@ public class Tesi {
   private String corsoLaurea;
   private String stato;
   private int idProfessore;
+  private TesiState statoOggetto;
 
-  // Costruttore vuoto
-  public Tesi() {}
+  public Tesi() {
+    setStatoOggetto(new BozzaState());
+  }
 
-  // Costruttore completo (per leggere dal DB)
   public Tesi(int idTesi, String titolo, String descrizione, String corsoLaurea, String stato, int idProfessore) {
     this.idTesi = idTesi;
     this.titolo = titolo;
@@ -19,18 +22,40 @@ public class Tesi {
     this.corsoLaurea = corsoLaurea;
     this.stato = stato;
     this.idProfessore = idProfessore;
+    setStato(stato);
   }
 
-  // Costruttore per nuovo inserimento (l'idTesi verrà generato dal DB)
   public Tesi(String titolo, String descrizione, String corsoLaurea, String stato, int idProfessore) {
     this.titolo = titolo;
     this.descrizione = descrizione;
     this.corsoLaurea = corsoLaurea;
-    this.stato = stato;
+    setStato(stato);
     this.idProfessore = idProfessore;
   }
 
-  // Getter e Setter
+  public void pubblica() {
+    if (statoOggetto != null) {
+      statoOggetto.pubblica(this);
+    }
+  }
+
+  public void assegna() {
+    if (statoOggetto != null) {
+      statoOggetto.assegna(this);
+    }
+  }
+
+  public void setStatoOggetto(TesiState nuovoStato) {
+    this.statoOggetto = nuovoStato;
+    if (nuovoStato != null) {
+      this.stato = nuovoStato.getNomeStato();
+    }
+  }
+
+  public TesiState getStatoOggetto() {
+    return statoOggetto;
+  }
+
   public int getIdTesi() { return idTesi; }
   public void setIdTesi(int idTesi) { this.idTesi = idTesi; }
 
@@ -44,7 +69,26 @@ public class Tesi {
   public void setCorsoLaurea(String corsoLaurea) { this.corsoLaurea = corsoLaurea; }
 
   public String getStato() { return stato; }
-  public void setStato(String stato) { this.stato = stato; }
+  public void setStato(String stato) {
+    this.stato = stato;
+    if (stato != null) {
+      switch (stato.toUpperCase()) {
+        case "BOZZA":
+          this.statoOggetto = new BozzaState();
+          break;
+        case "IN_CORSO":
+          this.statoOggetto = new InCorsoState();
+          break;
+        case "PUBBLICATA":
+        case "DISPONIBILE":
+          this.statoOggetto = new PubblicataState();
+          break;
+        default:
+          this.statoOggetto = new BozzaState();
+          break;
+      }
+    }
+  }
 
   public int getIdProfessore() { return idProfessore; }
   public void setIdProfessore(int idProfessore) { this.idProfessore = idProfessore; }

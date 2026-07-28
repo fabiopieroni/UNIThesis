@@ -2,6 +2,9 @@ package ui;
 
 import business.AuthService;
 import business.Sessione;
+import business.strategy.RequisitiIngegneriaStrategy;
+import business.strategy.VerificaRequisitiContext;
+import business.strategy.VerificaRequisitiStrategy;
 
 public class Main {
     public static void main(String[] args) {
@@ -56,6 +59,38 @@ public class Main {
             System.out.println("✅ Comportamento corretto: Accesso negato!");
         } else {
             System.err.println("❌ Errore: Ha fatto entrare l'utente con password sbagliata!");
+        }
+
+        System.out.println("\n==========================================");
+        System.out.println("   TEST STRATEGY VERIFICA REQUISITI CFU   ");
+        System.out.println("==========================================\n");
+
+        // --- TEST 5: Strategy Ingegneria (120 CFU) ---
+        System.out.println("📌 [TEST 5] Strategy Ingegneria (Soglia >= 120 CFU)...");
+        VerificaRequisitiStrategy stratIng = new RequisitiIngegneriaStrategy();
+
+        if (stratIng.verificaRequisiti(125)) {
+            System.out.println("✅ Studente con 125 CFU: Idoneo!");
+        } else {
+            System.err.println("❌ Errore Strategy Ingegneria (125 CFU dovrebbero bastare).");
+        }
+
+        if (!stratIng.verificaRequisiti(100)) {
+            System.out.println("✅ Studente con 100 CFU: Correttamente respinto!");
+        } else {
+            System.err.println("❌ Errore Strategy Ingegneria (100 CFU non devono bastare).");
+        }
+
+        System.out.println("\n------------------------------------------\n");
+
+        // --- TEST 6: Context Strategy dinamico ---
+        System.out.println("📌 [TEST 6] Factory Context Strategy (Economia)...");
+        VerificaRequisitiStrategy stratEco = VerificaRequisitiContext.getStrategy("economia");
+
+        if (stratEco.verificaRequisiti(105)) {
+            System.out.println("✅ Studente Economia con 105 CFU: Idoneo!");
+        } else {
+            System.err.println("❌ Errore Context Economia.");
         }
 
         System.out.println("\n==========================================");

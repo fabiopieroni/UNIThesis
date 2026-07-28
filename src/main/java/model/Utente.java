@@ -4,13 +4,13 @@ public class Utente {
     private int idUtente;
     private String email;
     private String password;
-    private String ruolo;
+    private Ruolo ruolo; // <-- Cambiato da String a Ruolo
     private String nome;
     private String cognome;
 
     public Utente() {}
 
-    public Utente(int idUtente, String email, String password, String ruolo, String nome, String cognome) {
+    public Utente(int idUtente, String email, String password, Ruolo ruolo, String nome, String cognome) {
         this.idUtente = idUtente;
         this.email = email;
         this.password = password;
@@ -19,7 +19,7 @@ public class Utente {
         this.cognome = cognome;
     }
 
-    public Utente(String email, String password, String ruolo, String nome, String cognome) {
+    public Utente(String email, String password, Ruolo ruolo, String nome, String cognome) {
         this.email = email;
         this.password = password;
         this.ruolo = ruolo;
@@ -36,8 +36,8 @@ public class Utente {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getRuolo() { return ruolo; }
-    public void setRuolo(String ruolo) { this.ruolo = ruolo; }
+    public Ruolo getRuolo() { return ruolo; }
+    public void setRuolo(Ruolo ruolo) { this.ruolo = ruolo; }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }

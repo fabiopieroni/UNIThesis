@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.controllers.CandidaturaFormController">
+    <padding>
+        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+    </padding>
+
+    <Label text="Candidati a una tesi" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <Label text="Tesi disponibili:"/>
+    <ListView fx:id="listaTesi" prefHeight="220.0"/>
+
+    <Label text="Messaggio per il docente:"/>
+    <TextArea fx:id="motivazioneField" prefHeight="80.0" wrapText="true"/>
+
+    <Label fx:id="feedbackLabel" style="-fx-text-fill: red;"/>
+
+    <Button text="Invia candidatura" onAction="#handleInvia"/>
+    <Button text="Torna al menu" onAction="#handleIndietro"/>
+</VBox>

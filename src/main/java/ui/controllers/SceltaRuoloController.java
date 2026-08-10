@@ -45,13 +45,13 @@ public class SceltaRuoloController {
         if (Sessione.getInstance().isStudente()) {
             menuBox.getChildren().addAll(
                     creaBottone("Gestione Tesi"),
-                    creaBottone("Gestione Candidature"),
+                    creaBottoneCandidature(),
                     creaBottone("Gestione Revisioni")
             );
         } else if (Sessione.getInstance().isProfessore()) {
             menuBox.getChildren().addAll(
                     creaBottone("Gestione Tesi"),
-                    creaBottone("Gestione Candidature"),
+                    creaBottoneCandidature(),
                     creaBottone("Gestione Revisioni")
             );
         } else if (Sessione.getInstance().isSegreteria()) {
@@ -66,6 +66,25 @@ public class SceltaRuoloController {
         Button b = new Button(testo);
         b.setMaxWidth(250);
         b.setOnAction(e -> mostraNonImplementato(testo));
+        return b;
+    }
+
+    private Button creaBottoneCandidature() {
+        Button b = new Button("Gestione Candidature");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            String fxml = Sessione.getInstance().isStudente()
+                    ? "/fxml/CandidaturaForm.fxml"
+                    : "/fxml/GestioneCandidature.fxml";
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+                Parent root = loader.load();
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
         return b;
     }
 

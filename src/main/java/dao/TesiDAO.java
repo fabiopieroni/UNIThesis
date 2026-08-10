@@ -16,4 +16,7 @@ public interface TesiDAO {
 
   // Ricerca per ID Professore
   List<Tesi> cercaPerProfessore(int idProfessore);
+
+  // Tesi disponibili per candidatura
+  List<Tesi> trovaDisponibili();
 }

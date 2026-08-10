@@ -9,7 +9,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TesiDAOimpl implements TesiDAO {
+  @Override
+  public List<Tesi> trovaDisponibili() {
+    List<Tesi> lista = new ArrayList<>();
+    String sql = "SELECT id_tesi, titolo, descrizione, corso_laurea, stato, id_professore " +
+            "FROM tesi WHERE stato = 'DISPONIBILE'";
 
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql);
+         ResultSet rs = pstmt.executeQuery()) {
+
+      while (rs.next()) {
+        lista.add(new Tesi(
+                rs.getInt("id_tesi"),
+                rs.getString("titolo"),
+                rs.getString("descrizione"),
+                rs.getString("corso_laurea"),
+                rs.getString("stato"),
+                rs.getInt("id_professore")
+        ));
+      }
+    } catch (SQLException e) {
+      System.err.println("Errore durante il recupero delle tesi disponibili: " + e.getMessage());
+    }
+    return lista;
+  }
   // 1. Inserimento nuova proposta tesi
   @Override
   public boolean salvaTesi(Tesi tesi) {

@@ -45,13 +45,13 @@ public class SceltaRuoloController {
         if (Sessione.getInstance().isStudente()) {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/CatalogoTesi.fxml", "Catalogo Tesi"),
-                    creaBottone("Gestione Candidature"),
+                    creaBottoneCandidature(),
                     creaBottone("Gestione Revisioni")
             );
         } else if (Sessione.getInstance().isProfessore()) {
             menuBox.getChildren().addAll(
-              creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
-                    creaBottone("Gestione Candidature"),
+                    creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
+                    creaBottoneCandidature(),
                     creaBottone("Gestione Revisioni")
             );
         } else if (Sessione.getInstance().isSegreteria()) {
@@ -69,23 +69,42 @@ public class SceltaRuoloController {
         return b;
     }
 
-  private Button creaBottoneNavigazione(String testo, String percorsoFxml, String titoloFinestra) {
-    Button b = new Button(testo);
-    b.setMaxWidth(250);
-    b.setOnAction(e -> {
-      try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFxml));
-        Parent root = loader.load();
-        Stage stage = (Stage) b.getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle(titoloFinestra);
-        stage.centerOnScreen();
-      } catch (IOException ex) {
-        ex.printStackTrace();
-      }
-    });
-    return b;
-  }
+    private Button creaBottoneCandidature() {
+        Button b = new Button("Gestione Candidature");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            String fxml = Sessione.getInstance().isStudente()
+                    ? "/fxml/CandidaturaForm.fxml"
+                    : "/fxml/GestioneCandidature.fxml";
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+                Parent root = loader.load();
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
+    private Button creaBottoneNavigazione(String testo, String percorsoFxml, String titoloFinestra) {
+        Button b = new Button(testo);
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFxml));
+                Parent root = loader.load();
+                Stage stage = (Stage) b.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle(titoloFinestra);
+                stage.centerOnScreen();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
 
     // Placeholder: qui in futuro collegherai le vere schermate
     // (es. caricare GestioneTesi.fxml con il relativo controller

@@ -9,8 +9,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TesiDAOimpl implements TesiDAO {
+  @Override
+  public List<Tesi> trovaDisponibili() {
+    List<Tesi> lista = new ArrayList<>();
+    String sql = "SELECT id_tesi, titolo, descrizione, corso_laurea, stato, id_professore " +
+            "FROM tesi WHERE stato = 'PUBBLICATA'";
 
-  // 1. Inserimento nuova proposta tesi
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql);
+         ResultSet rs = pstmt.executeQuery()) {
+
+      while (rs.next()) {
+        lista.add(new Tesi(
+                rs.getInt("id_tesi"),
+                rs.getString("titolo"),
+                rs.getString("descrizione"),
+                rs.getString("corso_laurea"),
+                rs.getString("stato"),
+                rs.getInt("id_professore")
+        ));
+      }
+    } catch (SQLException e) {
+      System.err.println("Errore durante il recupero delle tesi disponibili: " + e.getMessage());
+    }
+    return lista;
+  }
   @Override
   public boolean salvaTesi(Tesi tesi) {
     String query = "INSERT INTO tesi (titolo, descrizione, corso_laurea, stato, id_professore) VALUES (?, ?, ?, ?, ?)";
@@ -31,7 +54,6 @@ public class TesiDAOimpl implements TesiDAO {
     }
   }
 
-  // 2. Modifica proposta tesi
   @Override
   public boolean aggiornaTesi(Tesi tesi) {
     String query = "UPDATE tesi SET titolo = ?, descrizione = ?, corso_laurea = ?, stato = ? WHERE id_tesi = ?";
@@ -52,7 +74,6 @@ public class TesiDAOimpl implements TesiDAO {
     }
   }
 
-  // 3a. Ricerca per Parola Chiave (nel titolo o nella descrizione)
   @Override
   public List<Tesi> cercaPerParolaChiave(String keyword) {
     List<Tesi> risultati = new ArrayList<>();
@@ -75,7 +96,6 @@ public class TesiDAOimpl implements TesiDAO {
     return risultati;
   }
 
-  // 3b. Ricerca per Professore (tramite ID)
   @Override
   public List<Tesi> cercaPerProfessore(int idProfessore) {
     List<Tesi> risultati = new ArrayList<>();
@@ -96,7 +116,25 @@ public class TesiDAOimpl implements TesiDAO {
     return risultati;
   }
 
-  // Metodo privato di supporto per convertire una riga del ResultSet in un oggetto Tesi
+  @Override
+  public Tesi getTesiById(int idTesi) {
+    String query = "SELECT * FROM tesi WHERE id_tesi = ?";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+      stmt.setInt(1, idTesi);
+
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        return mappaResultSetInTesi(rs);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   private Tesi mappaResultSetInTesi(ResultSet rs) throws SQLException {
     return new Tesi(
       rs.getInt("id_tesi"),

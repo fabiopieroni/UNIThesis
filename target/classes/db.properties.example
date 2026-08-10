@@ -1,3 +1,0 @@
-db.url=jdbc:postgresql://localhost:5432/unithesis_db
-db.user=postgres
-db.password=INSERISCI_QUI_LA_TUA_PASSWORD

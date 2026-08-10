@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.controllers.CatalogoTesiFXController">
+  <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+  <Label text="Catalogo Tesi Disponibili" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+  <HBox spacing="10">
+    <TextField fx:id="campoRicerca" promptText="Cerca per titolo o descrizione" prefWidth="300"/>
+    <ComboBox fx:id="comboFiltroCorso" prefWidth="220"/>
+    <Button text="Cerca" onAction="#eseguiRicerca"/>
+  </HBox>
+
+  <TableView fx:id="tabellaCatalogo" prefHeight="400">
+    <columns>
+      <TableColumn fx:id="colTitolo" text="Titolo" prefWidth="180"/>
+      <TableColumn fx:id="colDescrizione" text="Descrizione" prefWidth="300"/>
+      <TableColumn fx:id="colCorso" text="Corso di Laurea" prefWidth="180"/>
+    </columns>
+  </TableView>
+</VBox>

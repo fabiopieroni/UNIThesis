@@ -120,6 +120,26 @@ public class TesiDAOimpl implements TesiDAO {
     return risultati;
   }
 
+  // Ricerca per ID Tesi (Aggiunto per l'Observer Pattern)
+  @Override
+  public Tesi getTesiById(int idTesi) {
+    String query = "SELECT * FROM tesi WHERE id_tesi = ?";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+
+      stmt.setInt(1, idTesi);
+
+      ResultSet rs = stmt.executeQuery();
+      if (rs.next()) {
+        return mappaResultSetInTesi(rs);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
   // Metodo privato di supporto per convertire una riga del ResultSet in un oggetto Tesi
   private Tesi mappaResultSetInTesi(ResultSet rs) throws SQLException {
     return new Tesi(

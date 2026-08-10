@@ -4,8 +4,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox spacing="12" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="ui.controllers.CatalogoTesiFXController">
+      xmlns:fx="http://javafx.com/fxml" fx:controller="ui.controllers.CatalogoTesiFXController">
   <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
   <Label text="Catalogo Tesi Disponibili" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
@@ -23,4 +22,6 @@
       <TableColumn fx:id="colCorso" text="Corso di Laurea" prefWidth="180"/>
     </columns>
   </TableView>
+
+  <Button text="Torna al menu" onAction="#handleIndietro"/>
 </VBox>

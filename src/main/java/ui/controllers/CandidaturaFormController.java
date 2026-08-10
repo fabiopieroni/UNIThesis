@@ -51,6 +51,13 @@ public class CandidaturaFormController {
         }
 
         Studente studente = (Studente) Sessione.getInstance().getUtenteCorrente();
+
+        if (richiestaDAO.haRichiestaAttiva(studente.getIdUtente())) {
+            feedbackLabel.setText("Hai già una candidatura in attesa o accettata. " +
+                    "Puoi candidarti di nuovo solo dopo un rifiuto.");
+            return;
+        }
+
         Richiesta richiesta = new Richiesta(
                 studente.getIdUtente(),
                 selezionata.getIdTesi(),
@@ -64,7 +71,7 @@ public class CandidaturaFormController {
             alert.showAndWait();
             tornaAlMenu(event);
         } else {
-            feedbackLabel.setText("Errore durante l'invio. Riprova.");
+            feedbackLabel.setText("Errore durante l'invio, oppure hai già una candidatura attiva. Riprova.");
         }
     }
 
@@ -81,6 +88,17 @@ public class CandidaturaFormController {
             stage.setScene(new Scene(root));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void preselezionaTesi(Tesi tesi) {
+        if (tesi == null) return;
+        for (Tesi t : listaTesi.getItems()) {
+            if (t.getIdTesi() == tesi.getIdTesi()) {
+                listaTesi.getSelectionModel().select(t);
+                listaTesi.scrollTo(t);
+                break;
+            }
         }
     }
 }

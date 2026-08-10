@@ -12,6 +12,11 @@ public class RichiestaDAOimpl implements RichiestaDAO {
 
     @Override
     public boolean salvaRichiesta(Richiesta richiesta) {
+        if (haRichiestaAttiva(richiesta.getIdStudente())) {
+            System.err.println("Lo studente ha già una candidatura attiva.");
+            return false;
+        }
+
         String sql = "INSERT INTO richieste_tesi (id_studente, id_tesi, motivazione) VALUES (?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -31,7 +36,13 @@ public class RichiestaDAOimpl implements RichiestaDAO {
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante il salvataggio della richiesta: " + e.getMessage());
+            // Se per qualche race condition il check sopra non basta,
+            // il vincolo DB (unique index) fa scattare qui una violazione
+            if (e.getSQLState() != null && e.getSQLState().equals("23505")) {
+                System.err.println("Candidatura attiva già presente (vincolo DB).");
+            } else {
+                System.err.println("Errore durante il salvataggio della richiesta: " + e.getMessage());
+            }
         }
         return false;
     }
@@ -161,5 +172,23 @@ public class RichiestaDAOimpl implements RichiestaDAO {
     @Override
     public boolean rifiutaRichiesta(int idRichiesta) {
         return aggiornaStato(idRichiesta, "RIFIUTATA");
+    }
+
+    @Override
+    public boolean haRichiestaAttiva(int idStudente) {
+        String sql = "SELECT 1 FROM richieste_tesi WHERE id_studente = ? AND stato IN ('IN_ATTESA', 'ACCETTATA')";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idStudente);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                return rs.next(); // true se trova almeno una riga
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante il controllo della richiesta attiva: " + e.getMessage());
+            return true; // fail-safe: in caso di errore, blocca per precauzione
+        }
     }
 }

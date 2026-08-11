@@ -44,13 +44,13 @@ public class SceltaRuoloController {
 
         if (Sessione.getInstance().isStudente()) {
             menuBox.getChildren().addAll(
-                    creaBottone("Gestione Tesi"),
+                    creaBottoneNavigazione("Gestione Tesi", "/fxml/CatalogoTesi.fxml", "Catalogo Tesi"),
                     creaBottone("Gestione Candidature"),
                     creaBottone("Gestione Revisioni")
             );
         } else if (Sessione.getInstance().isProfessore()) {
             menuBox.getChildren().addAll(
-                    creaBottone("Gestione Tesi"),
+              creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
                     creaBottone("Gestione Candidature"),
                     creaBottone("Gestione Revisioni")
             );
@@ -68,6 +68,24 @@ public class SceltaRuoloController {
         b.setOnAction(e -> mostraNonImplementato(testo));
         return b;
     }
+
+  private Button creaBottoneNavigazione(String testo, String percorsoFxml, String titoloFinestra) {
+    Button b = new Button(testo);
+    b.setMaxWidth(250);
+    b.setOnAction(e -> {
+      try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFxml));
+        Parent root = loader.load();
+        Stage stage = (Stage) b.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle(titoloFinestra);
+        stage.centerOnScreen();
+      } catch (IOException ex) {
+        ex.printStackTrace();
+      }
+    });
+    return b;
+  }
 
     // Placeholder: qui in futuro collegherai le vere schermate
     // (es. caricare GestioneTesi.fxml con il relativo controller

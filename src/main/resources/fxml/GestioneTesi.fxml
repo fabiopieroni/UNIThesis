@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="ui.controllers.GestioneTesiFXController">
+  <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+  <Label text="Le mie tesi" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+  <TableView fx:id="tabellaTesi" prefHeight="250">
+    <columns>
+      <TableColumn fx:id="colTitolo" text="Titolo" prefWidth="200"/>
+      <TableColumn fx:id="colCorso" text="Corso di Laurea" prefWidth="200"/>
+      <TableColumn fx:id="colStato" text="Stato" prefWidth="120"/>
+    </columns>
+  </TableView>
+  <Button text="Pubblica tesi selezionata" onAction="#pubblicaTesiSelezionata"/>
+
+  <Separator/>
+
+  <Label text="Crea nuova proposta di tesi" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+  <TextField fx:id="campoTitolo" promptText="Titolo"/>
+  <TextArea fx:id="campoDescrizione" promptText="Descrizione" prefRowCount="4"/>
+  <ComboBox fx:id="comboCorsoLaurea" promptText="Corso di laurea" prefWidth="300"/>
+  <Button text="Crea Tesi" onAction="#creaTesi"/>
+  <Label fx:id="labelErrore" style="-fx-text-fill: red;"/>
+</VBox>

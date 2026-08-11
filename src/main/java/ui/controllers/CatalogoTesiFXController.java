@@ -3,6 +3,8 @@ package ui.controllers;
 import business.GestioneTesiController;
 import business.Sessione;
 import business.impl.GestioneTesiControllerimpl;
+import dao.UtenteDAO;
+import dao.impl.UtenteDAOimpl;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,8 +31,10 @@ public class CatalogoTesiFXController {
   @FXML private TableColumn<Tesi, String> colTitolo;
   @FXML private TableColumn<Tesi, String> colDescrizione;
   @FXML private TableColumn<Tesi, String> colCorso;
+  @FXML private TableColumn<Tesi, Void> colInfo;
 
   private final GestioneTesiController gestioneTesiController = new GestioneTesiControllerimpl();
+  private final UtenteDAO utenteDAO = new UtenteDAOimpl();
 
   @FXML
   public void initialize() {
@@ -42,6 +46,8 @@ public class CatalogoTesiFXController {
     colTitolo.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTitolo()));
     colDescrizione.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getDescrizione()));
     colCorso.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getCorsoLaurea()));
+
+    aggiungiColonnaInfo();
 
     Utente utente = Sessione.getInstance().getUtenteCorrente();
     if (utente instanceof Studente studente && studente.getCorsoLaurea() != null) {
@@ -75,6 +81,46 @@ public class CatalogoTesiFXController {
     }
 
     tabellaCatalogo.setItems(FXCollections.observableArrayList(risultati));
+  }
+
+  private void aggiungiColonnaInfo() {
+    colInfo.setCellFactory(col -> new TableCell<>() {
+      private final Button infoBtn = new Button("i");
+
+      {
+        infoBtn.setStyle(
+                "-fx-background-radius: 50%; -fx-min-width: 26; -fx-min-height: 26; " +
+                        "-fx-max-width: 26; -fx-max-height: 26; -fx-font-weight: bold;"
+        );
+        infoBtn.setOnAction(e -> {
+          Tesi t = getTableView().getItems().get(getIndex());
+          mostraInfoTesi(t);
+        });
+      }
+
+      @Override
+      protected void updateItem(Void item, boolean empty) {
+        super.updateItem(item, empty);
+        setGraphic(empty ? null : infoBtn);
+      }
+    });
+  }
+
+  private void mostraInfoTesi(Tesi tesi) {
+    Utente professore = utenteDAO.trovaPerId(tesi.getIdProfessore());
+    String nomeProfessore = professore != null
+            ? professore.getNome() + " " + professore.getCognome()
+            : "Non disponibile";
+
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("Dettagli tesi");
+    alert.setHeaderText(tesi.getTitolo());
+    alert.setContentText(
+            "Descrizione: " + (tesi.getDescrizione() != null ? tesi.getDescrizione() : "-") +
+                    "\n\nProfessore: " + nomeProfessore
+    );
+    alert.getDialogPane().setPrefWidth(400);
+    alert.showAndWait();
   }
 
   private void gestisciClickTesi(Tesi tesi) {

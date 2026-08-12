@@ -11,4 +11,8 @@ public interface GestioneTesiController {
     boolean pubblicaTesi(Tesi tesi);
     List<Tesi> cercaTesi(String keyword);
     List<Tesi> getTesiByProfessore(int idProfessore);
+    Tesi getTesiById(int idTesi);
+    boolean consegnaTesi(int idTesi);
+    boolean accettaTesiFinale(int idTesi);
+    boolean rifiutaTesiFinale(int idTesi);
 }

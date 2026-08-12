@@ -52,7 +52,8 @@ public class SceltaRuoloController {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
                     creaBottoneCandidature(),
-                    creaBottoneRevisioniProf()
+                    creaBottoneRevisioniProf(),
+                    creaBottoneTesisti()
             );
         } else if (Sessione.getInstance().isSegreteria()) {
             menuBox.getChildren().addAll(
@@ -137,14 +138,25 @@ public class SceltaRuoloController {
         Button b = new Button("Gestione Revisioni");
         b.setMaxWidth(250);
         b.setOnAction(e -> {
+            Utente utente = Sessione.getInstance().getUtenteCorrente();
+            Integer idTesi = new dao.impl.RichiestaDAOimpl()
+                    .trovaIdTesiAccettataPerStudente(utente.getIdUtente());
+
+            if (idTesi == null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Nessuna tesi assegnata");
+                alert.setHeaderText(null);
+                alert.setContentText("Non hai ancora una tesi assegnata. Attendi che un professore accetti la tua candidatura.");
+                alert.showAndWait();
+                return;
+            }
+
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RevisioneCapitolo.fxml"));
                 Parent root = loader.load();
 
                 RevisioneCapitoloFXController controller = loader.getController();
-                // TODO: sostituire con l'idTesi reale dello studente loggato
-                // non appena il collegamento studente->tesi (via Candidatura) sarà completo.
-                controller.initData(1); // PLACEHOLDER
+                controller.initData(idTesi);
 
                 Stage stage = (Stage) menuBox.getScene().getWindow();
                 stage.setScene(new Scene(root));
@@ -164,9 +176,31 @@ public class SceltaRuoloController {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/GestioneRevisioniProf.fxml"));
                 Parent root = loader.load();
+
+                GestioneRevisioniProfFXController controller = loader.getController();
+                controller.mostraTutte();
+
                 Stage stage = (Stage) menuBox.getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Gestione Revisioni");
+                stage.centerOnScreen();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
+    private Button creaBottoneTesisti() {
+        Button b = new Button("I miei Tesisti");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TesistiAttivi.fxml"));
+                Parent root = loader.load();
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("I miei tesisti");
                 stage.centerOnScreen();
             } catch (IOException ex) {
                 ex.printStackTrace();

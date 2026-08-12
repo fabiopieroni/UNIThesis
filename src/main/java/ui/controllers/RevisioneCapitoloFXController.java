@@ -22,6 +22,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import java.io.IOException;
+import business.GestioneTesiController;
+import business.impl.GestioneTesiControllerimpl;
+import model.Tesi;
+import javafx.scene.control.Label;
 
 public class RevisioneCapitoloFXController {
 
@@ -40,6 +44,13 @@ public class RevisioneCapitoloFXController {
     @FXML private Button btnScegliPdf;
     @FXML private Button btnInvia;
 
+    @FXML private Button btnCorreggiRinvia;
+
+    @FXML private Label lblStatoTesi;
+    @FXML private Button btnConsegnaTesi;
+
+    private final GestioneTesiController gestioneTesi = new GestioneTesiControllerimpl();
+    private Tesi tesiCorrente;
     // Riferimento al livello di business
     private GestioneRevisioniController gestioneRevisioni;
     private int tesiIdCorrente = -1; // Verrà impostato dalla schermata precedente
@@ -52,29 +63,42 @@ public class RevisioneCapitoloFXController {
 
     @FXML
     public void initialize() {
-        // Setup delle colonne della tabella (i nomi devono coincidere con le variabili dell'entità model)
         colNumCapitolo.setCellValueFactory(new PropertyValueFactory<>("numCapitolo"));
         colTitolo.setCellValueFactory(new PropertyValueFactory<>("titoloCapitolo"));
         colStato.setCellValueFactory(new PropertyValueFactory<>("statoRevisione"));
         colData.setCellValueFactory(new PropertyValueFactory<>("dataInvio"));
 
-        // Listener per mostrare le note quando si clicca su una riga della tabella
         tabellaRevisioni.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null && newSelection.getNoteProfessore() != null) {
                 txtAreaNote.setText(newSelection.getNoteProfessore());
             } else {
                 txtAreaNote.setText("Nessuna nota presente per questa revisione.");
             }
+            btnCorreggiRinvia.setDisable(newSelection == null ||
+                    !"DA_CORREGGERE".equals(newSelection.getStatoRevisione()));
         });
     }
 
-    /**
-     * Metodo da chiamare quando si apre questa schermata dalla Dashboard/Lista Tesi
-     * per passargli l'ID della Tesi di cui vogliamo vedere le revisioni.
-     */
+
     public void initData(int idTesi) {
         this.tesiIdCorrente = idTesi;
+        this.tesiCorrente = gestioneTesi.getTesiById(idTesi);
+        aggiornaStatoUI();
         caricaTabella();
+    }
+
+    private void aggiornaStatoUI() {
+        if (tesiCorrente == null) return;
+
+        lblStatoTesi.setText("Stato tesi: " + tesiCorrente.getStato());
+
+        boolean modificabile = "IN_CORSO".equals(tesiCorrente.getStato());
+
+        txtNumCapitolo.setDisable(!modificabile);
+        txtTitoloCapitolo.setDisable(!modificabile);
+        btnScegliPdf.setDisable(!modificabile);
+        btnInvia.setDisable(!modificabile);
+        btnConsegnaTesi.setDisable(!modificabile);
     }
 
     private void caricaTabella() {
@@ -82,6 +106,25 @@ public class RevisioneCapitoloFXController {
             List<RevisioneCapitolo> revisioni = gestioneRevisioni.getRevisioniPerTesi(tesiIdCorrente);
             listaRevisioni.setAll(revisioni != null ? revisioni : List.of());
             tabellaRevisioni.setItems(listaRevisioni);
+        }
+    }
+
+    @FXML
+    void consegnaTesiDefinitiva(ActionEvent event) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Conferma consegna");
+        confirm.setHeaderText(null);
+        confirm.setContentText("Una volta consegnata, la tesi non sarà più modificabile finché il professore non la valuta. Continuare?");
+
+        if (confirm.showAndWait().filter(r -> r == javafx.scene.control.ButtonType.OK).isPresent()) {
+            boolean ok = gestioneTesi.consegnaTesi(tesiIdCorrente);
+            if (ok) {
+                tesiCorrente = gestioneTesi.getTesiById(tesiIdCorrente);
+                aggiornaStatoUI();
+                mostraSuccesso("Tesi consegnata! In attesa di valutazione del professore.");
+            } else {
+                mostraErrore("Impossibile consegnare la tesi in questo momento.");
+            }
         }
     }
 
@@ -175,6 +218,33 @@ public class RevisioneCapitoloFXController {
             stage.centerOnScreen();
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    void correggiERinvia(ActionEvent event) {
+        RevisioneCapitolo selezionata = tabellaRevisioni.getSelectionModel().getSelectedItem();
+        if (selezionata == null) {
+            mostraErrore("Seleziona prima un capitolo dalla tabella.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleziona il PDF corretto");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File PDF", "*.pdf"));
+
+        Stage stage = (Stage) btnCorreggiRinvia.getScene().getWindow();
+        File fileSelezionato = fileChooser.showOpenDialog(stage);
+
+        if (fileSelezionato != null) {
+            boolean successo = gestioneRevisioni.rinviaCorrezione(
+                    selezionata.getIdRevisione(), fileSelezionato.getAbsolutePath());
+            if (successo) {
+                mostraSuccesso("Capitolo corretto e rinviato con successo!");
+                caricaTabella();
+            } else {
+                mostraErrore("Errore durante il rinvio del capitolo. Riprova.");
+            }
         }
     }
 }

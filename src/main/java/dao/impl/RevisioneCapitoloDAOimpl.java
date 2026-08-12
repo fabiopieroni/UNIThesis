@@ -38,6 +38,21 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
     }
 
     @Override
+    public boolean rinviaCorrezione(int idRevisione, String nuovoPercorsoPdf) {
+        String query = "UPDATE revisioni_capitoli SET percorso_pdf = ?, stato_revisione = 'IN_REVISIONE', " +
+                "data_invio = CURRENT_TIMESTAMP WHERE id_revisione = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, nuovoPercorsoPdf);
+            ps.setInt(2, idRevisione);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
     public List<RevisioneCapitolo> findByTesi(int idTesi) {
         List<RevisioneCapitolo> lista = new ArrayList<>();
         String query = "SELECT * FROM revisioni_capitoli WHERE id_tesi = ? ORDER BY num_capitolo ASC";

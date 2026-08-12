@@ -23,6 +23,9 @@
         </font>
     </Label>
 
+    <!-- Stato attuale della tesi -->
+    <Label fx:id="lblStatoTesi" text="Stato tesi: —" style="-fx-font-size: 14px; -fx-text-fill: #555;" />
+
     <!-- Tabella Storico -->
     <TableView fx:id="tabellaRevisioni" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <columns>
@@ -32,6 +35,9 @@
             <TableColumn fx:id="colData" prefWidth="150.0" text="Data Invio" />
         </columns>
     </TableView>
+
+    <!-- Bottone Correggi e Rinvia: attivo solo se il capitolo selezionato è DA_CORREGGERE -->
+    <Button fx:id="btnCorreggiRinvia" mnemonicParsing="false" onAction="#correggiERinvia" text="Correggi e Rinvia" disable="true" />
 
     <!-- Sezione Lettura Note -->
     <Label text="Note del Professore">
@@ -62,6 +68,14 @@
     </HBox>
 
     <Button fx:id="btnInvia" mnemonicParsing="false" onAction="#inviaRevisione" text="Invia Revisione" />
+
+    <!-- Consegna finale della tesi -->
+    <Button fx:id="btnConsegnaTesi" mnemonicParsing="false" onAction="#consegnaTesiDefinitiva" text="Consegna Tesi definitiva" disable="true"
+            style="-fx-font-weight: bold;">
+        <VBox.margin>
+            <Insets top="10.0" />
+        </VBox.margin>
+    </Button>
 
     <Button fx:id="btnIndietro" mnemonicParsing="false" onAction="#handleIndietro" text="Torna al menu" />
 

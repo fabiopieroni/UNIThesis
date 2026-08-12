@@ -11,6 +11,8 @@ public interface TesiDAO {
   // Modifica proposal tesi
   boolean aggiornaTesi(Tesi tesi);
 
+  boolean aggiornaStato(int idTesi, String nuovoStato);
+
   // Ricerca per parole chiave (titolo o descrizione)
   List<Tesi> cercaPerParolaChiave(String keyword);
 
@@ -22,4 +24,5 @@ public interface TesiDAO {
 
   // Recupero tesi per ID
   Tesi getTesiById(int idTesi);
+
 }

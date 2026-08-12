@@ -49,6 +49,10 @@ public class GestioneRevisioniProfFXController {
     private final ObservableList<RevisioneCapitolo> listaRevisioni = FXCollections.observableArrayList();
     private final Map<Integer, String> titoliTesiPerId = new HashMap<>();
 
+    private Integer idTesiFiltro = null;
+
+    private final Map<Integer, String> statoTesiPerId = new HashMap<>();
+
     @FXML
     public void initialize() {
         colTesi.setCellValueFactory(cellData ->
@@ -64,35 +68,63 @@ public class GestioneRevisioniProfFXController {
             if (newSel != null) {
                 txtNote.setText(newSel.getNoteProfessore() != null ? newSel.getNoteProfessore() : "");
                 comboStato.setValue(newSel.getStatoRevisione());
+
+                String statoTesi = statoTesiPerId.get(newSel.getIdTesi());
+                boolean tesiModificabile = "IN_CORSO".equals(statoTesi);
+
+                comboStato.setDisable(!tesiModificabile);
+                txtNote.setDisable(!tesiModificabile);
             } else {
                 txtNote.clear();
                 comboStato.setValue(null);
             }
         });
 
+    }
+
+    public void mostraTutte() {
+        this.idTesiFiltro = null;
+        caricaRevisioni();
+    }
+
+    public void initData(int idTesi) {
+        this.idTesiFiltro = idTesi;
         caricaRevisioni();
     }
 
     private void caricaRevisioni() {
-        Utente utente = Sessione.getInstance().getUtenteCorrente();
-        int idProfessore = utente.getIdUtente();
-
-        List<Tesi> tesiDelProfessore = gestioneTesi.getTesiByProfessore(idProfessore);
-        if (tesiDelProfessore == null) {
-            tesiDelProfessore = List.of();
-        }
-
         listaRevisioni.clear();
         titoliTesiPerId.clear();
+        statoTesiPerId.clear();
 
-        for (Tesi tesi : tesiDelProfessore) {
-            titoliTesiPerId.put(tesi.getIdTesi(), tesi.getTitolo());
-            List<RevisioneCapitolo> revisioni = gestioneRevisioni.getRevisioniPerTesi(tesi.getIdTesi());
-            if (revisioni != null) {
-                listaRevisioni.addAll(revisioni);
+        if (idTesiFiltro != null) {
+            Tesi tesi = gestioneTesi.getTesiById(idTesiFiltro);
+            if (tesi != null) {
+                titoliTesiPerId.put(tesi.getIdTesi(), tesi.getTitolo());
+                statoTesiPerId.put(tesi.getIdTesi(), tesi.getStato());
+                List<RevisioneCapitolo> revisioni = gestioneRevisioni.getRevisioniPerTesi(tesi.getIdTesi());
+                if (revisioni != null) {
+                    listaRevisioni.addAll(revisioni);
+                }
+            }
+        } else {
+            Utente utente = Sessione.getInstance().getUtenteCorrente();
+            int idProfessore = utente.getIdUtente();
+
+            List<Tesi> tesiDelProfessore = gestioneTesi.getTesiByProfessore(idProfessore);
+            if (tesiDelProfessore == null) {
+                tesiDelProfessore = List.of();
+            }
+
+            for (Tesi tesi : tesiDelProfessore) {
+                titoliTesiPerId.put(tesi.getIdTesi(), tesi.getTitolo());
+                statoTesiPerId.put(tesi.getIdTesi(), tesi.getStato());
+                List<RevisioneCapitolo> revisioni = gestioneRevisioni.getRevisioniPerTesi(tesi.getIdTesi());
+                if (revisioni != null) {
+                    listaRevisioni.addAll(revisioni);
+                }
             }
         }
-
         tabellaRevisioni.setItems(listaRevisioni);
     }
 
@@ -103,6 +135,13 @@ public class GestioneRevisioniProfFXController {
             mostraErrore("Seleziona prima un capitolo dalla tabella.");
             return;
         }
+
+        String statoTesi = statoTesiPerId.get(selezionata.getIdTesi());
+        if (!"IN_CORSO".equals(statoTesi)) {
+            mostraErrore("Questa tesi è già stata consegnata o accettata: non è più possibile correggere i capitoli.");
+            return;
+        }
+
         String nuovoStato = comboStato.getValue();
         if (nuovoStato == null) {
             mostraErrore("Seleziona uno stato (APPROVATO / RIFIUTATO / DA_CORREGGERE).");

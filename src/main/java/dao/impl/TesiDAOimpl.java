@@ -55,6 +55,20 @@ public class TesiDAOimpl implements TesiDAO {
   }
 
   @Override
+  public boolean aggiornaStato(int idTesi, String nuovoStato) {
+    String sql = "UPDATE tesi SET stato = ? WHERE id_tesi = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setString(1, nuovoStato);
+      stmt.setInt(2, idTesi);
+      return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @Override
   public boolean aggiornaTesi(Tesi tesi) {
     String query = "UPDATE tesi SET titolo = ?, descrizione = ?, corso_laurea = ?, stato = ? WHERE id_tesi = ?";
 

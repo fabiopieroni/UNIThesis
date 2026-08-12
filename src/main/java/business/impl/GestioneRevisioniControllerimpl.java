@@ -65,12 +65,18 @@ public class GestioneRevisioniControllerimpl implements GestioneRevisioniControl
     }
 
     @Override
-    public List<RevisioneCapitolo> getRevisioniPerTesi(int idTesi) {
-        return null;
+    public boolean rinviaCorrezione(int idRevisione, String nuovoPercorsoPdf) {
+        boolean successo = revisioneDAO.rinviaCorrezione(idRevisione, nuovoPercorsoPdf);
+        if (successo) {
+        }
+        return successo;
     }
 
     @Override
-    public boolean aggiornaStatoRevisione(int idRevisione, String nuovoStato, String note) {
-        return false;
+    public List<RevisioneCapitolo> getRevisioniPerTesi(int idTesi) {
+        return revisioneDAO.findByTesi(idTesi);
     }
-}
+    @Override
+    public boolean aggiornaStatoRevisione(int idRevisione, String nuovoStato, String note) {
+        return revisioneDAO.aggiornaStatoENote(idRevisione, nuovoStato, note);
+    }}

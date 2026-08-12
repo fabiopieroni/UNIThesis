@@ -41,7 +41,7 @@ VALUES (
            'Sviluppo Applicazioni Web Java',
            'Progetto di tesi sull architettura layered con Java e PostgreSQL',
            'Informatica',
-           'DISPONIBILE',
+           'PUBBLICATA',
            (SELECT id_utente FROM utenti WHERE email = 'luigi.verdi@unifi.it')
        );
 

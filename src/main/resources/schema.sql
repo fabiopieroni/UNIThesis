@@ -36,7 +36,7 @@ CREATE TABLE tesi (
                       titolo VARCHAR(255) NOT NULL,
                       descrizione TEXT,
                       corso_laurea VARCHAR(150) NOT NULL,
-                      stato VARCHAR(50) NOT NULL DEFAULT 'DISPONIBILE',
+                      stato VARCHAR(50) NOT NULL DEFAULT 'PUBBLICATA',
                       id_professore INT NOT NULL REFERENCES professori(id_utente) ON DELETE CASCADE
 );
 
@@ -84,3 +84,7 @@ CREATE TABLE notifiche (
                            data_invio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                            letta BOOLEAN DEFAULT FALSE
 );
+
+CREATE UNIQUE INDEX idx_richiesta_attiva_per_studente
+    ON richieste_tesi (id_studente)
+    WHERE stato IN ('IN_ATTESA', 'ACCETTATA');

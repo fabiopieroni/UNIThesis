@@ -104,6 +104,32 @@ public class UtenteDAOimpl implements UtenteDAO {
         }
         return null;
     }
+    @Override
+    public Utente trovaPerId(int idUtente) {
+        String sql = "SELECT id_utente, email, password, ruolo, nome, cognome FROM utenti WHERE id_utente = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idUtente);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Utente(
+                            rs.getInt("id_utente"),
+                            rs.getString("email"),
+                            rs.getString("password"),
+                            Ruolo.fromString(rs.getString("ruolo")),
+                            rs.getString("nome"),
+                            rs.getString("cognome")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la ricerca dell'utente per id: " + e.getMessage());
+        }
+        return null;
+    }
 
     @Override
     public Utente trovaPerEmail(String email) {

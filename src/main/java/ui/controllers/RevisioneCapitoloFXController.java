@@ -15,10 +15,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.RevisioneCapitolo;
-
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import java.io.IOException;
 
 public class RevisioneCapitoloFXController {
 
@@ -77,7 +80,7 @@ public class RevisioneCapitoloFXController {
     private void caricaTabella() {
         if (gestioneRevisioni != null && tesiIdCorrente != -1) {
             List<RevisioneCapitolo> revisioni = gestioneRevisioni.getRevisioniPerTesi(tesiIdCorrente);
-            listaRevisioni.setAll(revisioni);
+            listaRevisioni.setAll(revisioni != null ? revisioni : List.of());
             tabellaRevisioni.setItems(listaRevisioni);
         }
     }
@@ -160,5 +163,18 @@ public class RevisioneCapitoloFXController {
         alert.setHeaderText(null);
         alert.setContentText(messaggio);
         alert.showAndWait();
+    }
+    @FXML
+    void handleIndietro(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) tabellaRevisioni.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Scelta ruolo");
+            stage.centerOnScreen();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 }

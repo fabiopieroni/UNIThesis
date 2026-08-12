@@ -46,8 +46,7 @@ public class SceltaRuoloController {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/CatalogoTesi.fxml", "Catalogo Tesi"),
                     creaBottoneCandidature(),
-                    creaBottone("Gestione Revisioni")
-            );
+                    creaBottoneRevisioni()            );
         } else if (Sessione.getInstance().isProfessore()) {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
@@ -132,4 +131,29 @@ public class SceltaRuoloController {
             e.printStackTrace();
         }
     }
+
+    private Button creaBottoneRevisioni() {
+        Button b = new Button("Gestione Revisioni");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RevisioneCapitolo.fxml"));
+                Parent root = loader.load();
+
+                RevisioneCapitoloFXController controller = loader.getController();
+                // TODO: sostituire con l'idTesi reale dello studente loggato
+                // non appena il collegamento studente->tesi (via Candidatura) sarà completo.
+                controller.initData(1); // PLACEHOLDER
+
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Gestione Revisioni");
+                stage.centerOnScreen();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
 }

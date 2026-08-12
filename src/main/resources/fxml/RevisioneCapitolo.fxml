@@ -63,4 +63,6 @@
 
     <Button fx:id="btnInvia" mnemonicParsing="false" onAction="#inviaRevisione" text="Invia Revisione" />
 
+    <Button fx:id="btnIndietro" mnemonicParsing="false" onAction="#handleIndietro" text="Torna al menu" />
+
 </VBox>

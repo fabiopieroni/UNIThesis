@@ -4,6 +4,7 @@ import business.GestioneTesiController;
 import dao.TesiDAO;
 import dao.impl.TesiDAOimpl;
 import model.Tesi;
+import model.TesiConDettagli;
 
 import java.util.List;
 
@@ -74,6 +75,29 @@ public class GestioneTesiControllerimpl implements GestioneTesiController {
     }
     return tesiDAO.aggiornaStato(idTesi, "IN_CORSO");
   }
+
+  @Override
+  public List<TesiConDettagli> getTesiAccettate() {
+    return tesiDAO.trovaConDettagliPerStato("ACCETTATA");
+  }
+
+  @Override
+  public List<TesiConDettagli> getTesiPerVistaSegreteria(String filtroStato) {
+    if (filtroStato == null || filtroStato.isBlank()) {
+      return tesiDAO.trovaTutteConDettagliEscludendoBozza();
+    }
+    return tesiDAO.trovaConDettagliPerStato(filtroStato);
+  }
+
+  @Override
+  public boolean archiviaTesi(int idTesi) {
+    Tesi tesi = tesiDAO.getTesiById(idTesi);
+    if (tesi == null || !"ACCETTATA".equals(tesi.getStato())) {
+      return false;
+    }
+    return tesiDAO.aggiornaStato(idTesi, "ARCHIVIATA");
+  }
+
 }
 
 

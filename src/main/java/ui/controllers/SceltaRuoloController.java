@@ -57,17 +57,10 @@ public class SceltaRuoloController {
             );
         } else if (Sessione.getInstance().isSegreteria()) {
             menuBox.getChildren().addAll(
-                    creaBottone("Gestione Tesi"),
-                    creaBottone("Gestione Utenti")
+                    creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesiSegreteria.fxml", "Gestione Tesi"),
+                    creaBottoneNavigazione("Gestione Utenti", "/fxml/GestioneUtenti.fxml", "Gestione Utenti")
             );
         }
-    }
-
-    private Button creaBottone(String testo) {
-        Button b = new Button(testo);
-        b.setMaxWidth(250);
-        b.setOnAction(e -> mostraNonImplementato(testo));
-        return b;
     }
 
     private Button creaBottoneCandidature() {
@@ -105,17 +98,6 @@ public class SceltaRuoloController {
             }
         });
         return b;
-    }
-
-    // Placeholder: qui in futuro collegherai le vere schermate
-    // (es. caricare GestioneTesi.fxml con il relativo controller
-    // che userà GestioneTesiController/impl del package business)
-    private void mostraNonImplementato(String funzione) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("In sviluppo");
-        alert.setHeaderText(null);
-        alert.setContentText("La funzione \"" + funzione + "\" non è ancora implementata.");
-        alert.showAndWait();
     }
 
     @FXML

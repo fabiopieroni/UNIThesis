@@ -5,6 +5,8 @@ import dao.UtenteDAO;
 import model.*;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UtenteDAOimpl implements UtenteDAO {
 
@@ -27,7 +29,6 @@ public class UtenteDAOimpl implements UtenteDAO {
                     String passDb = rs.getString("password");
                     Ruolo ruolo = Ruolo.fromString(rs.getString("ruolo"));
 
-                    // Caricamento dei dati specifici in base al ruolo
                     if (ruolo == Ruolo.STUDENTE) {
                         return caricaDatiStudente(conn, idUtente, emailDb, passDb, nome, cognome);
                     } else if (ruolo == Ruolo.PROFESSORE) {
@@ -104,6 +105,7 @@ public class UtenteDAOimpl implements UtenteDAO {
         }
         return null;
     }
+
     @Override
     public Utente trovaPerId(int idUtente) {
         String sql = "SELECT id_utente, email, password, ruolo, nome, cognome FROM utenti WHERE id_utente = ?";
@@ -199,6 +201,243 @@ public class UtenteDAOimpl implements UtenteDAO {
         } catch (SQLException e) {
             System.err.println("❌ Errore aggiornamento profilo: " + e.getMessage());
             return false;
+        }
+    }
+
+    @Override
+    public List<Utente> trovaTutti() {
+        List<Utente> lista = new ArrayList<>();
+        String sql = "SELECT id_utente, email, password, ruolo, nome, cognome FROM utenti ORDER BY cognome, nome";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new Utente(
+                        rs.getInt("id_utente"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        Ruolo.fromString(rs.getString("ruolo")),
+                        rs.getString("nome"),
+                        rs.getString("cognome")
+                ));
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante il recupero degli utenti: " + e.getMessage());
+        }
+        return lista;
+    }
+
+    @Override
+    public Utente trovaDettagliCompletiPerId(int idUtente) {
+        String sql = "SELECT * FROM utenti WHERE id_utente = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idUtente);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int id = rs.getInt("id_utente");
+                    String nome = rs.getString("nome");
+                    String cognome = rs.getString("cognome");
+                    String email = rs.getString("email");
+                    String pass = rs.getString("password");
+                    Ruolo ruolo = Ruolo.fromString(rs.getString("ruolo"));
+
+                    if (ruolo == Ruolo.STUDENTE) {
+                        return caricaDatiStudente(conn, id, email, pass, nome, cognome);
+                    } else if (ruolo == Ruolo.PROFESSORE) {
+                        return caricaDatiProfessore(conn, id, email, pass, nome, cognome);
+                    } else {
+                        Utente u = new Utente();
+                        u.setIdUtente(id);
+                        u.setEmail(email);
+                        u.setPassword(pass);
+                        u.setNome(nome);
+                        u.setCognome(cognome);
+                        u.setRuolo(ruolo);
+                        return u;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante il recupero dettagli utente: " + e.getMessage());
+        }
+        return null;
+    }
+
+    @Override
+    public boolean salvaStudente(Studente studente) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlUtente = "INSERT INTO utenti (email, password, ruolo, nome, cognome) VALUES (?, ?, 'STUDENTE', ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlUtente, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, studente.getEmail());
+                stmt.setString(2, studente.getPassword());
+                stmt.setString(3, studente.getNome());
+                stmt.setString(4, studente.getCognome());
+                stmt.executeUpdate();
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        studente.setIdUtente(rs.getInt(1));
+                    }
+                }
+            }
+
+            String sqlStudente = "INSERT INTO studenti (id_utente, matricola, cfu_totali, corso_laurea) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlStudente)) {
+                stmt.setInt(1, studente.getIdUtente());
+                stmt.setString(2, studente.getMatricola());
+                stmt.setInt(3, studente.getCfuTotali());
+                stmt.setString(4, studente.getCorsoLaurea());
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) {}
+            }
+            System.err.println("Errore durante il salvataggio dello studente: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException ignored) {}
+            }
+        }
+    }
+
+    @Override
+    public boolean salvaProfessore(Professore professore) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlUtente = "INSERT INTO utenti (email, password, ruolo, nome, cognome) VALUES (?, ?, 'PROFESSORE', ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlUtente, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, professore.getEmail());
+                stmt.setString(2, professore.getPassword());
+                stmt.setString(3, professore.getNome());
+                stmt.setString(4, professore.getCognome());
+                stmt.executeUpdate();
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        professore.setIdUtente(rs.getInt(1));
+                    }
+                }
+            }
+
+            String sqlProfessore = "INSERT INTO professori (id_utente, matricola_docente, corso_laurea, num_tesisti_attivi) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlProfessore)) {
+                stmt.setInt(1, professore.getIdUtente());
+                stmt.setString(2, professore.getMatricolaDocente());
+                stmt.setString(3, professore.getCorsoLaurea());
+                stmt.setInt(4, professore.getNumTesistiAttivi());
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) {}
+            }
+            System.err.println("Errore durante il salvataggio del professore: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException ignored) {}
+            }
+        }
+    }
+
+    @Override
+    public boolean aggiornaStudente(Studente studente) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlUtente = "UPDATE utenti SET email = ?, password = ?, nome = ?, cognome = ? WHERE id_utente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlUtente)) {
+                stmt.setString(1, studente.getEmail());
+                stmt.setString(2, studente.getPassword());
+                stmt.setString(3, studente.getNome());
+                stmt.setString(4, studente.getCognome());
+                stmt.setInt(5, studente.getIdUtente());
+                stmt.executeUpdate();
+            }
+
+            String sqlStudente = "UPDATE studenti SET matricola = ?, cfu_totali = ?, corso_laurea = ? WHERE id_utente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlStudente)) {
+                stmt.setString(1, studente.getMatricola());
+                stmt.setInt(2, studente.getCfuTotali());
+                stmt.setString(3, studente.getCorsoLaurea());
+                stmt.setInt(4, studente.getIdUtente());
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) {}
+            }
+            System.err.println("Errore durante l'aggiornamento dello studente: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException ignored) {}
+            }
+        }
+    }
+
+    @Override
+    public boolean aggiornaProfessore(Professore professore) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlUtente = "UPDATE utenti SET email = ?, password = ?, nome = ?, cognome = ? WHERE id_utente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlUtente)) {
+                stmt.setString(1, professore.getEmail());
+                stmt.setString(2, professore.getPassword());
+                stmt.setString(3, professore.getNome());
+                stmt.setString(4, professore.getCognome());
+                stmt.setInt(5, professore.getIdUtente());
+                stmt.executeUpdate();
+            }
+
+            String sqlProfessore = "UPDATE professori SET matricola_docente = ?, corso_laurea = ?, num_tesisti_attivi = ? WHERE id_utente = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlProfessore)) {
+                stmt.setString(1, professore.getMatricolaDocente());
+                stmt.setString(2, professore.getCorsoLaurea());
+                stmt.setInt(3, professore.getNumTesistiAttivi());
+                stmt.setInt(4, professore.getIdUtente());
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ignored) {}
+            }
+            System.err.println("Errore durante l'aggiornamento del professore: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try { conn.close(); } catch (SQLException ignored) {}
+            }
         }
     }
 }

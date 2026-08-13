@@ -4,9 +4,6 @@ import business.Sessione;
 import business.AuthService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -71,10 +68,8 @@ public class SceltaRuoloController {
                     ? "/fxml/CandidaturaForm.fxml"
                     : "/fxml/GestioneCandidature.fxml";
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-                Parent root = loader.load();
                 Stage stage = (Stage) menuBox.getScene().getWindow();
-                stage.setScene(new Scene(root));
+                ui.NavigationUtil.cambiaScena(stage, fxml, null);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -87,12 +82,8 @@ public class SceltaRuoloController {
         b.setMaxWidth(250);
         b.setOnAction(e -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFxml));
-                Parent root = loader.load();
                 Stage stage = (Stage) b.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle(titoloFinestra);
-                stage.centerOnScreen();
+                ui.NavigationUtil.cambiaScena(stage, percorsoFxml, titoloFinestra);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -104,13 +95,8 @@ public class SceltaRuoloController {
     private void handleLogout(ActionEvent event) {
         authService.logout();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Parent root = loader.load();
-
             Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/Login.fxml", "Login");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -134,16 +120,10 @@ public class SceltaRuoloController {
             }
 
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RevisioneCapitolo.fxml"));
-                Parent root = loader.load();
-
-                RevisioneCapitoloFXController controller = loader.getController();
-                controller.initData(idTesi);
-
                 Stage stage = (Stage) menuBox.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("Gestione Revisioni");
-                stage.centerOnScreen();
+                RevisioneCapitoloFXController controller = ui.NavigationUtil.cambiaScena(
+                        stage, "/fxml/RevisioneCapitolo.fxml", "Gestione Revisioni");
+                controller.initData(idTesi);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -156,16 +136,10 @@ public class SceltaRuoloController {
         b.setMaxWidth(250);
         b.setOnAction(e -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/GestioneRevisioniProf.fxml"));
-                Parent root = loader.load();
-
-                GestioneRevisioniProfFXController controller = loader.getController();
-                controller.mostraTutte();
-
                 Stage stage = (Stage) menuBox.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("Gestione Revisioni");
-                stage.centerOnScreen();
+                GestioneRevisioniProfFXController controller = ui.NavigationUtil.cambiaScena(
+                        stage, "/fxml/GestioneRevisioniProf.fxml", "Gestione Revisioni");
+                controller.mostraTutte();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -178,12 +152,8 @@ public class SceltaRuoloController {
         b.setMaxWidth(250);
         b.setOnAction(e -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TesistiAttivi.fxml"));
-                Parent root = loader.load();
                 Stage stage = (Stage) menuBox.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("I miei tesisti");
-                stage.centerOnScreen();
+                ui.NavigationUtil.cambiaScena(stage, "/fxml/TesistiAttivi.fxml", "I miei tesisti");
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

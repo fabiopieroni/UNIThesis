@@ -7,10 +7,7 @@ import dao.RichiestaDAO;
 import dao.impl.RichiestaDAOimpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -129,16 +126,10 @@ public class TesistiAttiviController {
 
     private void apriRevisioniPerTesi(int idTesi) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/GestioneRevisioniProf.fxml"));
-            Parent root = loader.load();
-
-            GestioneRevisioniProfFXController controller = loader.getController();
-            controller.initData(idTesi);
-
             Stage stage = (Stage) tabellaTesisti.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Gestione Revisioni");
-            stage.centerOnScreen();
+            GestioneRevisioniProfFXController controller = ui.NavigationUtil.cambiaScena(
+                    stage, "/fxml/GestioneRevisioniProf.fxml", "Gestione Revisioni");
+            controller.initData(idTesi);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -147,10 +138,8 @@ public class TesistiAttiviController {
     @FXML
     private void handleIndietro(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
-            Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/SceltaRuolo.fxml", null);
         } catch (IOException e) {
             e.printStackTrace();
         }

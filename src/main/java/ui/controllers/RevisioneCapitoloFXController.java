@@ -18,9 +18,6 @@ import model.RevisioneCapitolo;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.List;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import java.io.IOException;
 import business.GestioneTesiController;
 import business.impl.GestioneTesiControllerimpl;
@@ -51,9 +48,8 @@ public class RevisioneCapitoloFXController {
 
     private final GestioneTesiController gestioneTesi = new GestioneTesiControllerimpl();
     private Tesi tesiCorrente;
-    // Riferimento al livello di business
     private GestioneRevisioniController gestioneRevisioni;
-    private int tesiIdCorrente = -1; // Verrà impostato dalla schermata precedente
+    private int tesiIdCorrente = -1;
 
     private ObservableList<RevisioneCapitolo> listaRevisioni = FXCollections.observableArrayList();
 
@@ -132,10 +128,8 @@ public class RevisioneCapitoloFXController {
     void scegliFilePdf(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleziona il PDF del Capitolo");
-        // Filtro per far vedere solo i file PDF
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File PDF", "*.pdf"));
 
-        // Apre la finestra di selezione partendo dal bottone
         Stage stage = (Stage) btnScegliPdf.getScene().getWindow();
         File fileSelezionato = fileChooser.showOpenDialog(stage);
 
@@ -146,7 +140,6 @@ public class RevisioneCapitoloFXController {
 
     @FXML
     void inviaRevisione(ActionEvent event) {
-        // Controllo validità campi
         if (txtNumCapitolo.getText().isEmpty() || txtTitoloCapitolo.getText().isEmpty() || txtPercorsoPdf.getText().isEmpty()) {
             mostraErrore("Compila tutti i campi e seleziona un file PDF prima di inviare.");
             return;
@@ -165,20 +158,16 @@ public class RevisioneCapitoloFXController {
             return;
         }
 
-        // Creazione dell'entità dal costruttore richiesto
         RevisioneCapitolo nuovaRevisione = new RevisioneCapitolo(
                 tesiIdCorrente,
                 numCapitolo,
                 txtTitoloCapitolo.getText(),
                 txtPercorsoPdf.getText()
         );
-        // Il costruttore imposta già "IN_REVISIONE" in automatico
 
-        // Chiamata al business
         if (gestioneRevisioni != null) {
             boolean successo = gestioneRevisioni.inviaRevisione(nuovaRevisione);
             if (successo) {
-                // Pulisce i campi e ricarica la tabella
                 txtNumCapitolo.clear();
                 txtTitoloCapitolo.clear();
                 txtPercorsoPdf.clear();
@@ -191,7 +180,6 @@ public class RevisioneCapitoloFXController {
         }
     }
 
-    // Metodi di utilità per i popup grafici
     private void mostraErrore(String messaggio) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Errore");
@@ -207,15 +195,12 @@ public class RevisioneCapitoloFXController {
         alert.setContentText(messaggio);
         alert.showAndWait();
     }
+
     @FXML
     void handleIndietro(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
-            Parent root = loader.load();
             Stage stage = (Stage) tabellaRevisioni.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Scelta ruolo");
-            stage.centerOnScreen();
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/SceltaRuolo.fxml", "Scelta ruolo");
         } catch (IOException ex) {
             ex.printStackTrace();
         }

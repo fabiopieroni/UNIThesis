@@ -8,15 +8,15 @@ import dao.impl.UtenteDAOimpl;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.Studente;
 import model.Tesi;
 import model.Utente;
+import dao.CorsoDiLaureaDAO;
+import dao.impl.CorsoDiLaureaDAOimpl;
+import model.CorsoDiLaurea;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,9 +38,11 @@ public class CatalogoTesiFXController {
 
   @FXML
   public void initialize() {
-    comboFiltroCorso.setItems(FXCollections.observableArrayList(
-            "Tutti", "Ingegneria Informatica", "Ingegneria Gestionale", "Ingegneria Elettronica"
-    ));
+    List<CorsoDiLaurea> corsi = new CorsoDiLaureaDAOimpl().trovaTutti();
+    List<String> nomiCorsi = corsi.stream().map(CorsoDiLaurea::getNome).collect(Collectors.toList());
+    nomiCorsi.add(0, "Tutti");
+
+    comboFiltroCorso.setItems(FXCollections.observableArrayList(nomiCorsi));
     comboFiltroCorso.setValue("Tutti");
 
     colTitolo.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty(data.getValue().getTitolo()));
@@ -130,16 +132,12 @@ public class CatalogoTesiFXController {
             : "/fxml/GestioneCandidature.fxml";
 
     try {
-      FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-      Parent root = loader.load();
-
-      if (utente instanceof Studente) {
-        CandidaturaFormController controller = loader.getController();
-        controller.preselezionaTesi(tesi);
-      }
-
       Stage stage = (Stage) tabellaCatalogo.getScene().getWindow();
-      stage.setScene(new Scene(root));
+      Object controller = ui.NavigationUtil.cambiaScena(stage, fxml, null);
+
+      if (utente instanceof Studente && controller instanceof CandidaturaFormController cfc) {
+        cfc.preselezionaTesi(tesi);
+      }
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -148,10 +146,8 @@ public class CatalogoTesiFXController {
   @FXML
   private void handleIndietro(ActionEvent event) {
     try {
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
-      Parent root = loader.load();
       Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-      stage.setScene(new Scene(root));
+      ui.NavigationUtil.cambiaScena(stage, "/fxml/SceltaRuolo.fxml", null);
     } catch (IOException e) {
       e.printStackTrace();
     }

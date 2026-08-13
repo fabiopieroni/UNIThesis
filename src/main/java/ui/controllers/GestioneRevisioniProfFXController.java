@@ -10,9 +10,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
@@ -181,12 +178,8 @@ public class GestioneRevisioniProfFXController {
     @FXML
     void handleIndietro(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
-            Parent root = loader.load();
             Stage stage = (Stage) tabellaRevisioni.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Scelta ruolo");
-            stage.centerOnScreen();
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/SceltaRuolo.fxml", "Scelta ruolo");
         } catch (IOException ex) {
             ex.printStackTrace();
         }

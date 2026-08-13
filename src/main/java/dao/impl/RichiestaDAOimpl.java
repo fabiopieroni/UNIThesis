@@ -151,6 +151,8 @@ public class RichiestaDAOimpl implements RichiestaDAO {
         String updateRichiesta = "UPDATE richieste_tesi SET stato = 'ACCETTATA' WHERE id = ?";
         String updateProfessore = "UPDATE professori SET num_tesisti_attivi = num_tesisti_attivi + 1 WHERE id_utente = ?";
         String updateTesi = "UPDATE tesi SET stato = 'IN_CORSO' WHERE id_tesi = ?";
+        String rifiutaAltreSql = "UPDATE richieste_tesi SET stato = 'RIFIUTATA' " +
+                "WHERE id_tesi = ? AND id != ? AND stato = 'IN_ATTESA'";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -174,7 +176,7 @@ public class RichiestaDAOimpl implements RichiestaDAO {
                         int attivi = rs.getInt("num_tesisti_attivi");
                         if (attivi >= 5) {
                             conn.rollback();
-                            return false; // BLOCCO: già 5 tesisti
+                            return false;
                         }
                     }
                 }
@@ -182,7 +184,8 @@ public class RichiestaDAOimpl implements RichiestaDAO {
 
             try (PreparedStatement upd1 = conn.prepareStatement(updateRichiesta);
                  PreparedStatement upd2 = conn.prepareStatement(updateProfessore);
-                 PreparedStatement upd3 = conn.prepareStatement(updateTesi)) {
+                 PreparedStatement upd3 = conn.prepareStatement(updateTesi);
+                 PreparedStatement upd4 = conn.prepareStatement(rifiutaAltreSql)) {
 
                 upd1.setInt(1, idRichiesta);
                 upd1.executeUpdate();
@@ -192,6 +195,10 @@ public class RichiestaDAOimpl implements RichiestaDAO {
 
                 upd3.setInt(1, idTesi);
                 upd3.executeUpdate();
+
+                upd4.setInt(1, idTesi);
+                upd4.setInt(2, idRichiesta);
+                upd4.executeUpdate();
             }
 
             conn.commit();

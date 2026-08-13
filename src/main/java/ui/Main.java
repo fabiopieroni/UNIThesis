@@ -15,7 +15,9 @@ public class Main extends Application {
 
         primaryStage.setTitle("UNIThesis - Login");
         primaryStage.setScene(new Scene(root));
-        primaryStage.centerOnScreen();
+
+        NavigationUtil.posizionaFinestra(primaryStage);
+
         primaryStage.show();
     }
 

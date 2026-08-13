@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="750.0" prefWidth="900.0" spacing="15.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controllers.GestioneTesiSegreteriaController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label text="Tesi da archiviare">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+    <Label text="Tesi accettate dal professore, in attesa di chiusura pratica" style="-fx-text-fill: gray;" />
+
+    <TableView fx:id="tabellaAccettate" prefHeight="180.0">
+        <columns>
+            <TableColumn fx:id="colTitoloAccettate" prefWidth="300.0" text="Titolo" />
+            <TableColumn fx:id="colProfessoreAccettate" prefWidth="200.0" text="Professore" />
+            <TableColumn fx:id="colStudenteAccettate" prefWidth="200.0" text="Studente" />
+        </columns>
+    </TableView>
+
+    <Button mnemonicParsing="false" onAction="#archiviaSelezionata" text="Archivia tesi selezionata" />
+
+    <Separator>
+        <VBox.margin>
+            <Insets top="10.0" />
+        </VBox.margin>
+    </Separator>
+
+    <Label text="Tutte le tesi">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+
+    <HBox spacing="10.0">
+        <ComboBox fx:id="comboFiltroStato" prefWidth="200.0" />
+        <Button mnemonicParsing="false" onAction="#eseguiFiltro" text="Filtra" />
+    </HBox>
+
+    <TableView fx:id="tabellaTutte" prefHeight="220.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colTitoloTutte" prefWidth="260.0" text="Titolo" />
+            <TableColumn fx:id="colProfessoreTutte" prefWidth="180.0" text="Professore" />
+            <TableColumn fx:id="colStudenteTutte" prefWidth="180.0" text="Studente" />
+            <TableColumn fx:id="colStatoTutte" prefWidth="120.0" text="Stato" />
+        </columns>
+    </TableView>
+
+    <Button mnemonicParsing="false" onAction="#handleIndietro" text="Torna al menu" />
+
+</VBox>

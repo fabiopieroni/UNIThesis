@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="900.0" spacing="15.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controllers.RevisioneCapitoloFXController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <!-- Titolo Pagina -->
+    <Label text="Storico Revisioni">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+
+    <!-- Stato attuale della tesi -->
+    <Label fx:id="lblStatoTesi" text="Stato tesi: —" style="-fx-font-size: 14px; -fx-text-fill: #555;" />
+
+    <!-- Tabella Storico -->
+    <TableView fx:id="tabellaRevisioni" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="colNumCapitolo" prefWidth="100.0" text="N° Capitolo" />
+            <TableColumn fx:id="colTitolo" prefWidth="250.0" text="Titolo" />
+            <TableColumn fx:id="colStato" prefWidth="150.0" text="Stato" />
+            <TableColumn fx:id="colData" prefWidth="150.0" text="Data Invio" />
+        </columns>
+    </TableView>
+
+    <!-- Bottone Correggi e Rinvia: attivo solo se il capitolo selezionato è DA_CORREGGERE -->
+    <Button fx:id="btnCorreggiRinvia" mnemonicParsing="false" onAction="#correggiERinvia" text="Correggi e Rinvia" disable="true" />
+
+    <!-- Sezione Lettura Note -->
+    <Label text="Note del Professore">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Label>
+    <TextArea fx:id="txtAreaNote" editable="false" prefHeight="80.0" promptText="Seleziona una revisione dalla tabella per leggere le note del professore..." wrapText="true" />
+
+    <!-- Sezione Invio Nuovo Capitolo -->
+    <Label text="Invia nuovo capitolo">
+        <font>
+            <Font name="System Bold" size="16.0" />
+        </font>
+        <VBox.margin>
+            <Insets top="10.0" />
+        </VBox.margin>
+    </Label>
+
+    <HBox spacing="10.0">
+        <TextField fx:id="txtNumCapitolo" prefWidth="100.0" promptText="N° Capitolo" />
+        <TextField fx:id="txtTitoloCapitolo" prefWidth="400.0" promptText="Titolo Capitolo" HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <HBox spacing="10.0">
+        <TextField fx:id="txtPercorsoPdf" editable="false" prefWidth="400.0" promptText="Seleziona il file PDF..." HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnScegliPdf" mnemonicParsing="false" onAction="#scegliFilePdf" text="Sfoglia..." />
+    </HBox>
+
+    <Button fx:id="btnInvia" mnemonicParsing="false" onAction="#inviaRevisione" text="Invia Revisione" />
+
+    <!-- Consegna finale della tesi -->
+    <Button fx:id="btnConsegnaTesi" mnemonicParsing="false" onAction="#consegnaTesiDefinitiva" text="Consegna Tesi definitiva" disable="true"
+            style="-fx-font-weight: bold;">
+        <VBox.margin>
+            <Insets top="10.0" />
+        </VBox.margin>
+    </Button>
+
+    <Button fx:id="btnIndietro" mnemonicParsing="false" onAction="#handleIndietro" text="Torna al menu" />
+
+</VBox>

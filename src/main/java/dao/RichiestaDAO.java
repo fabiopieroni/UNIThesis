@@ -12,4 +12,5 @@ public interface RichiestaDAO {
     boolean accettaRichiesta(int idRichiesta, int idProfessore);
     boolean rifiutaRichiesta(int idRichiesta);
     boolean haRichiestaAttiva(int idStudente);
+    Integer trovaIdTesiAccettataPerStudente(int idStudente);
 }

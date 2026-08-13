@@ -1,4 +1,5 @@
 package ui.controllers;
+
 import javafx.scene.Node;
 import business.Sessione;
 import dao.RichiestaDAO;
@@ -7,14 +8,13 @@ import dao.impl.RichiestaDAOimpl;
 import dao.impl.TesiDAOimpl;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import model.Richiesta;
 import model.Studente;
 import model.Tesi;
+import business.strategy.VerificaRequisitiContext;
+import business.strategy.VerificaRequisitiStrategy;
 
 import java.io.IOException;
 import java.util.List;
@@ -58,6 +58,13 @@ public class CandidaturaFormController {
             return;
         }
 
+        VerificaRequisitiStrategy strategy = VerificaRequisitiContext.getStrategy(selezionata.getCorsoLaurea());
+        if (!strategy.verificaRequisiti(studente.getCfuTotali())) {
+            feedbackLabel.setText("Non hai i CFU minimi richiesti per candidarti a questa tesi (" +
+                    selezionata.getCorsoLaurea() + ").");
+            return;
+        }
+
         Richiesta richiesta = new Richiesta(
                 studente.getIdUtente(),
                 selezionata.getIdTesi(),
@@ -82,10 +89,8 @@ public class CandidaturaFormController {
 
     private void tornaAlMenu(ActionEvent event) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/SceltaRuolo.fxml"));
-            Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/SceltaRuolo.fxml", null);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -20,6 +20,7 @@
       <TableColumn fx:id="colTitolo" text="Titolo" prefWidth="180"/>
       <TableColumn fx:id="colDescrizione" text="Descrizione" prefWidth="300"/>
       <TableColumn fx:id="colCorso" text="Corso di Laurea" prefWidth="180"/>
+      <TableColumn fx:id="colInfo" text="" prefWidth="50"/>
     </columns>
   </TableView>
 

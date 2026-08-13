@@ -5,17 +5,19 @@ public class RichiestaConDettagli {
     private String nomeStudente;
     private String cognomeStudente;
     private String titoloTesi;
+    private int idTesi;
     private String stato;
     private java.sql.Timestamp dataRichiesta;
     private String motivazione;
 
     public RichiestaConDettagli(int id, String nomeStudente, String cognomeStudente,
-                                String titoloTesi, String stato,
+                                String titoloTesi, int idTesi, String stato,
                                 java.sql.Timestamp dataRichiesta, String motivazione) {
         this.id = id;
         this.nomeStudente = nomeStudente;
         this.cognomeStudente = cognomeStudente;
         this.titoloTesi = titoloTesi;
+        this.idTesi = idTesi;
         this.stato = stato;
         this.dataRichiesta = dataRichiesta;
         this.motivazione = motivazione;
@@ -25,6 +27,7 @@ public class RichiestaConDettagli {
     public String getNomeStudente() { return nomeStudente; }
     public String getCognomeStudente() { return cognomeStudente; }
     public String getTitoloTesi() { return titoloTesi; }
+    public int getIdTesi() { return idTesi; }
     public String getStato() { return stato; }
     public java.sql.Timestamp getDataRichiesta() { return dataRichiesta; }
     public String getMotivazione() { return motivazione; }

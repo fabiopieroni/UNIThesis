@@ -3,6 +3,7 @@ package dao.impl;
 import dao.DatabaseConnection;
 import dao.TesiDAO;
 import model.Tesi;
+import model.TesiConDettagli;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -55,6 +56,19 @@ public class TesiDAOimpl implements TesiDAO {
   }
 
   @Override
+  public boolean aggiornaStato(int idTesi, String nuovoStato) {
+    String sql = "UPDATE tesi SET stato = ? WHERE id_tesi = ?";
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setString(1, nuovoStato);
+      stmt.setInt(2, idTesi);
+      return stmt.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+  @Override
   public boolean aggiornaTesi(Tesi tesi) {
     String query = "UPDATE tesi SET titolo = ?, descrizione = ?, corso_laurea = ?, stato = ? WHERE id_tesi = ?";
 
@@ -77,7 +91,8 @@ public class TesiDAOimpl implements TesiDAO {
   @Override
   public List<Tesi> cercaPerParolaChiave(String keyword) {
     List<Tesi> risultati = new ArrayList<>();
-    String query = "SELECT * FROM tesi WHERE LOWER(titolo) LIKE ? OR LOWER(descrizione) LIKE ?";
+    String query = "SELECT * FROM tesi WHERE stato = 'PUBBLICATA' " +
+            "AND (LOWER(titolo) LIKE ? OR LOWER(descrizione) LIKE ?)";
 
     try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -117,6 +132,73 @@ public class TesiDAOimpl implements TesiDAO {
   }
 
   @Override
+  public List<TesiConDettagli> trovaConDettagliPerStato(String stato) {
+    List<TesiConDettagli> lista = new ArrayList<>();
+    String sql = "SELECT t.id_tesi, t.titolo, t.stato, " +
+            "up.nome AS nome_prof, up.cognome AS cognome_prof, " +
+            "us.nome AS nome_stud, us.cognome AS cognome_stud " +
+            "FROM tesi t " +
+            "JOIN utenti up ON t.id_professore = up.id_utente " +
+            "LEFT JOIN richieste_tesi r ON r.id_tesi = t.id_tesi AND r.stato = 'ACCETTATA' " +
+            "LEFT JOIN utenti us ON r.id_studente = us.id_utente " +
+            "WHERE t.stato = ? " +
+            "ORDER BY t.titolo";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+      stmt.setString(1, stato);
+      try (ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+          lista.add(mappaTesiConDettagli(rs));
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return lista;
+  }
+
+  @Override
+  public List<TesiConDettagli> trovaTutteConDettagliEscludendoBozza() {
+    List<TesiConDettagli> lista = new ArrayList<>();
+    String sql = "SELECT t.id_tesi, t.titolo, t.stato, " +
+            "up.nome AS nome_prof, up.cognome AS cognome_prof, " +
+            "us.nome AS nome_stud, us.cognome AS cognome_stud " +
+            "FROM tesi t " +
+            "JOIN utenti up ON t.id_professore = up.id_utente " +
+            "LEFT JOIN richieste_tesi r ON r.id_tesi = t.id_tesi AND r.stato = 'ACCETTATA' " +
+            "LEFT JOIN utenti us ON r.id_studente = us.id_utente " +
+            "WHERE t.stato != 'BOZZA' " +
+            "ORDER BY t.titolo";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+      try (ResultSet rs = stmt.executeQuery()) {
+        while (rs.next()) {
+          lista.add(mappaTesiConDettagli(rs));
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return lista;
+  }
+
+  private TesiConDettagli mappaTesiConDettagli(ResultSet rs) throws SQLException {
+    String nomeStud = rs.getString("nome_stud");
+    String cognomeStud = rs.getString("cognome_stud");
+    String studenteCompleto = nomeStud != null ? nomeStud + " " + cognomeStud : "—";
+
+    return new TesiConDettagli(
+            rs.getInt("id_tesi"),
+            rs.getString("titolo"),
+            rs.getString("stato"),
+            rs.getString("nome_prof") + " " + rs.getString("cognome_prof"),
+            studenteCompleto
+    );
+  }
+
+  @Override
   public Tesi getTesiById(int idTesi) {
     String query = "SELECT * FROM tesi WHERE id_tesi = ?";
 
@@ -134,6 +216,8 @@ public class TesiDAOimpl implements TesiDAO {
     }
     return null;
   }
+
+
 
   private Tesi mappaResultSetInTesi(ResultSet rs) throws SQLException {
     return new Tesi(

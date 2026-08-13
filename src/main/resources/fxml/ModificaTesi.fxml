@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="12" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml" fx:controller="ui.controllers.ModificaTesiController">
+    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+
+    <Label text="Modifica tesi" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <Label text="Titolo:"/>
+    <TextField fx:id="campoTitolo"/>
+
+    <Label text="Descrizione:"/>
+    <TextArea fx:id="campoDescrizione" prefHeight="150" wrapText="true"/>
+
+    <Label fx:id="labelErrore" style="-fx-text-fill: red;"/>
+
+    <HBox spacing="10">
+        <Button text="Salva modifiche" onAction="#salvaModifiche"/>
+        <Button text="Annulla" onAction="#annulla"/>
+    </HBox>
+</VBox>

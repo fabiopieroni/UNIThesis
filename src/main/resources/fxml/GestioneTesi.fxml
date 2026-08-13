@@ -13,9 +13,14 @@
       <TableColumn fx:id="colTitolo" text="Titolo" prefWidth="200"/>
       <TableColumn fx:id="colCorso" text="Corso di Laurea" prefWidth="200"/>
       <TableColumn fx:id="colStato" text="Stato" prefWidth="120"/>
+      <TableColumn fx:id="colInfo" text="" prefWidth="50"/>
     </columns>
   </TableView>
-  <Button text="Pubblica tesi selezionata" onAction="#pubblicaTesiSelezionata"/>
+
+  <HBox spacing="10">
+    <Button text="Pubblica tesi selezionata" onAction="#pubblicaTesiSelezionata"/>
+    <Button text="Modifica" onAction="#modificaTesiSelezionata"/>
+  </HBox>
 
   <Separator/>
 

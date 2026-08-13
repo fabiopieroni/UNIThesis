@@ -4,9 +4,6 @@ import business.Sessione;
 import business.AuthService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -46,27 +43,21 @@ public class SceltaRuoloController {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/CatalogoTesi.fxml", "Catalogo Tesi"),
                     creaBottoneCandidature(),
-                    creaBottone("Gestione Revisioni")
+                    creaBottoneRevisioni()
             );
         } else if (Sessione.getInstance().isProfessore()) {
             menuBox.getChildren().addAll(
                     creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesi.fxml", "Gestione Tesi"),
                     creaBottoneCandidature(),
-                    creaBottone("Gestione Revisioni")
+                    creaBottoneRevisioniProf(),
+                    creaBottoneTesisti()
             );
         } else if (Sessione.getInstance().isSegreteria()) {
             menuBox.getChildren().addAll(
-                    creaBottone("Gestione Tesi"),
-                    creaBottone("Gestione Utenti")
+                    creaBottoneNavigazione("Gestione Tesi", "/fxml/GestioneTesiSegreteria.fxml", "Gestione Tesi"),
+                    creaBottoneNavigazione("Gestione Utenti", "/fxml/GestioneUtenti.fxml", "Gestione Utenti")
             );
         }
-    }
-
-    private Button creaBottone(String testo) {
-        Button b = new Button(testo);
-        b.setMaxWidth(250);
-        b.setOnAction(e -> mostraNonImplementato(testo));
-        return b;
     }
 
     private Button creaBottoneCandidature() {
@@ -77,10 +68,8 @@ public class SceltaRuoloController {
                     ? "/fxml/CandidaturaForm.fxml"
                     : "/fxml/GestioneCandidature.fxml";
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
-                Parent root = loader.load();
                 Stage stage = (Stage) menuBox.getScene().getWindow();
-                stage.setScene(new Scene(root));
+                ui.NavigationUtil.cambiaScena(stage, fxml, null);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -93,12 +82,8 @@ public class SceltaRuoloController {
         b.setMaxWidth(250);
         b.setOnAction(e -> {
             try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(percorsoFxml));
-                Parent root = loader.load();
                 Stage stage = (Stage) b.getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle(titoloFinestra);
-                stage.centerOnScreen();
+                ui.NavigationUtil.cambiaScena(stage, percorsoFxml, titoloFinestra);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -106,30 +91,74 @@ public class SceltaRuoloController {
         return b;
     }
 
-    // Placeholder: qui in futuro collegherai le vere schermate
-    // (es. caricare GestioneTesi.fxml con il relativo controller
-    // che userà GestioneTesiController/impl del package business)
-    private void mostraNonImplementato(String funzione) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("In sviluppo");
-        alert.setHeaderText(null);
-        alert.setContentText("La funzione \"" + funzione + "\" non è ancora implementata.");
-        alert.showAndWait();
-    }
-
     @FXML
     private void handleLogout(ActionEvent event) {
         authService.logout();
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
-            Parent root = loader.load();
-
             Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Login");
-            stage.centerOnScreen();
+            ui.NavigationUtil.cambiaScena(stage, "/fxml/Login.fxml", "Login");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    private Button creaBottoneRevisioni() {
+        Button b = new Button("Gestione Revisioni");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            Utente utente = Sessione.getInstance().getUtenteCorrente();
+            Integer idTesi = new dao.impl.RichiestaDAOimpl()
+                    .trovaIdTesiAccettataPerStudente(utente.getIdUtente());
+
+            if (idTesi == null) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Nessuna tesi assegnata");
+                alert.setHeaderText(null);
+                alert.setContentText("Non hai ancora una tesi assegnata. Attendi che un professore accetti la tua candidatura.");
+                alert.showAndWait();
+                return;
+            }
+
+            try {
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                RevisioneCapitoloFXController controller = ui.NavigationUtil.cambiaScena(
+                        stage, "/fxml/RevisioneCapitolo.fxml", "Gestione Revisioni");
+                controller.initData(idTesi);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
+    private Button creaBottoneRevisioniProf() {
+        Button b = new Button("Gestione Revisioni");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            try {
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                GestioneRevisioniProfFXController controller = ui.NavigationUtil.cambiaScena(
+                        stage, "/fxml/GestioneRevisioniProf.fxml", "Gestione Revisioni");
+                controller.mostraTutte();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
+    private Button creaBottoneTesisti() {
+        Button b = new Button("I miei Tesisti");
+        b.setMaxWidth(250);
+        b.setOnAction(e -> {
+            try {
+                Stage stage = (Stage) menuBox.getScene().getWindow();
+                ui.NavigationUtil.cambiaScena(stage, "/fxml/TesistiAttivi.fxml", "I miei tesisti");
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+        return b;
+    }
+
 }

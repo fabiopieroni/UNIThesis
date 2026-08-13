@@ -1,6 +1,7 @@
 package business;
 
 import model.Tesi;
+import model.TesiConDettagli;
 import java.util.List;
 
 public interface GestioneTesiController {
@@ -11,4 +12,12 @@ public interface GestioneTesiController {
     boolean pubblicaTesi(Tesi tesi);
     List<Tesi> cercaTesi(String keyword);
     List<Tesi> getTesiByProfessore(int idProfessore);
+    Tesi getTesiById(int idTesi);
+    boolean consegnaTesi(int idTesi);
+    boolean accettaTesiFinale(int idTesi);
+    boolean rifiutaTesiFinale(int idTesi);
+
+    List<TesiConDettagli> getTesiAccettate();
+    List<TesiConDettagli> getTesiPerVistaSegreteria(String filtroStato);
+    boolean archiviaTesi(int idTesi);
 }

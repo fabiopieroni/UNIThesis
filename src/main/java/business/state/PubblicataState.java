@@ -1,12 +1,13 @@
 package business.state;
 
 import model.Tesi;
+import business.exception.TransizioneNonValidaException;
 
 public class PubblicataState implements TesiState {
 
   @Override
   public void pubblica(Tesi tesi) {
-    System.out.println("⚠️ La tesi è già stata pubblicata!");
+    throw new TransizioneNonValidaException("La tesi è già stata pubblicata!");
   }
 
   @Override

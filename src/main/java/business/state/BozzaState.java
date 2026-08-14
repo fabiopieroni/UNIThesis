@@ -1,6 +1,7 @@
 package business.state;
 
 import model.Tesi;
+import business.exception.TransizioneNonValidaException;
 
 public class BozzaState implements TesiState {
 
@@ -12,7 +13,7 @@ public class BozzaState implements TesiState {
 
   @Override
   public void assegna(Tesi tesi) {
-    System.out.println("❌ Impossibile assegnare una tesi in Bozza. Va prima pubblicata!");
+    throw new TransizioneNonValidaException("Impossibile assegnare una tesi in Bozza. Va prima pubblicata!");
   }
 
   @Override

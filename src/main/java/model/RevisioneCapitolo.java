@@ -8,6 +8,7 @@ public class RevisioneCapitolo {
     private int numCapitolo;
     private String titoloCapitolo;
     private String percorsoPdf;
+    private byte[] pdfData;
     private String noteProfessore;
     private String statoRevisione;
     private Timestamp dataInvio;
@@ -19,6 +20,15 @@ public class RevisioneCapitolo {
         this.numCapitolo = numCapitolo;
         this.titoloCapitolo = titoloCapitolo;
         this.percorsoPdf = percorsoPdf;
+        this.statoRevisione = "IN_REVISIONE";
+    }
+
+    public RevisioneCapitolo(int idTesi, int numCapitolo, String titoloCapitolo, String nomeFile, byte[] pdfData) {
+        this.idTesi = idTesi;
+        this.numCapitolo = numCapitolo;
+        this.titoloCapitolo = titoloCapitolo;
+        this.percorsoPdf = nomeFile;
+        this.pdfData = pdfData;
         this.statoRevisione = "IN_REVISIONE";
     }
 
@@ -36,6 +46,9 @@ public class RevisioneCapitolo {
 
     public String getPercorsoPdf() { return percorsoPdf; }
     public void setPercorsoPdf(String percorsoPdf) { this.percorsoPdf = percorsoPdf; }
+
+    public byte[] getPdfData() { return pdfData; }
+    public void setPdfData(byte[] pdfData) { this.pdfData = pdfData; }
 
     public String getNoteProfessore() { return noteProfessore; }
     public void setNoteProfessore(String noteProfessore) { this.noteProfessore = noteProfessore; }

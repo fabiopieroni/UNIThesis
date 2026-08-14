@@ -16,9 +16,10 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.RevisioneCapitolo;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.util.List;
-import java.io.IOException;
 import business.GestioneTesiController;
 import business.impl.GestioneTesiControllerimpl;
 import model.Tesi;
@@ -51,6 +52,8 @@ public class RevisioneCapitoloFXController {
     private GestioneRevisioniController gestioneRevisioni;
     private int tesiIdCorrente = -1;
 
+    private File fileSelezionato;
+
     private ObservableList<RevisioneCapitolo> listaRevisioni = FXCollections.observableArrayList();
 
     public RevisioneCapitoloFXController() {
@@ -74,7 +77,6 @@ public class RevisioneCapitoloFXController {
                     !"DA_CORREGGERE".equals(newSelection.getStatoRevisione()));
         });
     }
-
 
     public void initData(int idTesi) {
         this.tesiIdCorrente = idTesi;
@@ -131,16 +133,17 @@ public class RevisioneCapitoloFXController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File PDF", "*.pdf"));
 
         Stage stage = (Stage) btnScegliPdf.getScene().getWindow();
-        File fileSelezionato = fileChooser.showOpenDialog(stage);
+        File scelto = fileChooser.showOpenDialog(stage);
 
-        if (fileSelezionato != null) {
-            txtPercorsoPdf.setText(fileSelezionato.getAbsolutePath());
+        if (scelto != null) {
+            this.fileSelezionato = scelto;
+            txtPercorsoPdf.setText(scelto.getName());
         }
     }
 
     @FXML
     void inviaRevisione(ActionEvent event) {
-        if (txtNumCapitolo.getText().isEmpty() || txtTitoloCapitolo.getText().isEmpty() || txtPercorsoPdf.getText().isEmpty()) {
+        if (txtNumCapitolo.getText().isEmpty() || txtTitoloCapitolo.getText().isEmpty() || fileSelezionato == null) {
             mostraErrore("Compila tutti i campi e seleziona un file PDF prima di inviare.");
             return;
         }
@@ -158,11 +161,20 @@ public class RevisioneCapitoloFXController {
             return;
         }
 
+        byte[] contenutoPdf;
+        try {
+            contenutoPdf = Files.readAllBytes(fileSelezionato.toPath());
+        } catch (IOException e) {
+            mostraErrore("Impossibile leggere il file selezionato: " + e.getMessage());
+            return;
+        }
+
         RevisioneCapitolo nuovaRevisione = new RevisioneCapitolo(
                 tesiIdCorrente,
                 numCapitolo,
                 txtTitoloCapitolo.getText(),
-                txtPercorsoPdf.getText()
+                fileSelezionato.getName(),
+                contenutoPdf
         );
 
         if (gestioneRevisioni != null) {
@@ -172,6 +184,7 @@ public class RevisioneCapitoloFXController {
                 txtTitoloCapitolo.clear();
                 txtPercorsoPdf.clear();
                 txtAreaNote.clear();
+                fileSelezionato = null;
                 caricaTabella();
                 mostraSuccesso("Capitolo inviato in revisione con successo!");
             } else {
@@ -219,11 +232,19 @@ public class RevisioneCapitoloFXController {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File PDF", "*.pdf"));
 
         Stage stage = (Stage) btnCorreggiRinvia.getScene().getWindow();
-        File fileSelezionato = fileChooser.showOpenDialog(stage);
+        File fileCorretto = fileChooser.showOpenDialog(stage);
 
-        if (fileSelezionato != null) {
+        if (fileCorretto != null) {
+            byte[] contenutoPdf;
+            try {
+                contenutoPdf = Files.readAllBytes(fileCorretto.toPath());
+            } catch (IOException e) {
+                mostraErrore("Impossibile leggere il file selezionato: " + e.getMessage());
+                return;
+            }
+
             boolean successo = gestioneRevisioni.rinviaCorrezione(
-                    selezionata.getIdRevisione(), fileSelezionato.getAbsolutePath());
+                    selezionata.getIdRevisione(), fileCorretto.getName(), contenutoPdf);
             if (successo) {
                 mostraSuccesso("Capitolo corretto e rinviato con successo!");
                 caricaTabella();

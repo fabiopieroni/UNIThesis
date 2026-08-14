@@ -14,11 +14,16 @@ public class Main extends Application {
         Parent root = loader.load();
 
         primaryStage.setTitle("UNIThesis - Login");
-        primaryStage.setScene(new Scene(root));
+
+        Scene scene = new Scene(NavigationUtil.creaWrapperConWatermark(root));
+        NavigationUtil.aggiungiStile(scene);
+        primaryStage.setScene(scene);
 
         NavigationUtil.posizionaFinestra(primaryStage);
 
         primaryStage.show();
+        primaryStage.toFront();
+        primaryStage.requestFocus();
     }
 
     public static void main(String[] args) {

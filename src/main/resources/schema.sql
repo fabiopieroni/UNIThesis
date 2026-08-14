@@ -55,6 +55,7 @@ CREATE TABLE revisioni_capitoli (
                                     num_capitolo INT NOT NULL,
                                     titolo_capitolo VARCHAR(255) NOT NULL,
                                     percorso_pdf VARCHAR(500),
+                                    pdf_data BYTEA,
                                     note_professore TEXT,
                                     stato_revisione VARCHAR(50) NOT NULL DEFAULT 'IN_REVISIONE',
                                     data_invio TIMESTAMP DEFAULT CURRENT_TIMESTAMP

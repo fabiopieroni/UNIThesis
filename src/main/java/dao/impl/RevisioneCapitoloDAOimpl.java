@@ -12,7 +12,7 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
 
     @Override
     public boolean salva(RevisioneCapitolo r) {
-        String query = "INSERT INTO revisioni_capitoli (id_tesi, num_capitolo, titolo_capitolo, percorso_pdf, note_professore, stato_revisione) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO revisioni_capitoli (id_tesi, num_capitolo, titolo_capitolo, percorso_pdf, pdf_data, note_professore, stato_revisione) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -20,8 +20,9 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
             ps.setInt(2, r.getNumCapitolo());
             ps.setString(3, r.getTitoloCapitolo());
             ps.setString(4, r.getPercorsoPdf());
-            ps.setString(5, r.getNoteProfessore());
-            ps.setString(6, r.getStatoRevisione() != null ? r.getStatoRevisione() : "IN_REVISIONE");
+            ps.setBytes(5, r.getPdfData());
+            ps.setString(6, r.getNoteProfessore());
+            ps.setString(7, r.getStatoRevisione() != null ? r.getStatoRevisione() : "IN_REVISIONE");
 
             int rows = ps.executeUpdate();
             if (rows > 0) {
@@ -38,24 +39,12 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
     }
 
     @Override
-    public boolean rinviaCorrezione(int idRevisione, String nuovoPercorsoPdf) {
-        String query = "UPDATE revisioni_capitoli SET percorso_pdf = ?, stato_revisione = 'IN_REVISIONE', " +
-                "data_invio = CURRENT_TIMESTAMP WHERE id_revisione = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
-            ps.setString(1, nuovoPercorsoPdf);
-            ps.setInt(2, idRevisione);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    @Override
     public List<RevisioneCapitolo> findByTesi(int idTesi) {
         List<RevisioneCapitolo> lista = new ArrayList<>();
-        String query = "SELECT * FROM revisioni_capitoli WHERE id_tesi = ? ORDER BY num_capitolo ASC";
+
+        String query = "SELECT id_revisione, id_tesi, num_capitolo, titolo_capitolo, percorso_pdf, " +
+                "note_professore, stato_revisione, data_invio " +
+                "FROM revisioni_capitoli WHERE id_tesi = ? ORDER BY num_capitolo ASC";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(query)) {
 
@@ -93,5 +82,38 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public boolean rinviaCorrezione(int idRevisione, String nomeFile, byte[] pdfData) {
+        String query = "UPDATE revisioni_capitoli SET percorso_pdf = ?, pdf_data = ?, stato_revisione = 'IN_REVISIONE', " +
+                "data_invio = CURRENT_TIMESTAMP WHERE id_revisione = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setString(1, nomeFile);
+            ps.setBytes(2, pdfData);
+            ps.setInt(3, idRevisione);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public byte[] getPdfData(int idRevisione) {
+        String query = "SELECT pdf_data FROM revisioni_capitoli WHERE id_revisione = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, idRevisione);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBytes("pdf_data");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

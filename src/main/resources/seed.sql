@@ -166,15 +166,8 @@ VALUES (
 -- ==========================================
 -- 4. REVISIONI CAPITOLI (Dati di prova)
 -- ==========================================
-INSERT INTO revisioni_capitoli (id_tesi, num_capitolo, titolo_capitolo, percorso_pdf, note_professore, stato_revisione)
-VALUES (
-           (SELECT id_tesi FROM tesi WHERE titolo = 'Sviluppo Applicazioni Web Java'),
-           1,
-           'Capitolo 1: Introduzione e Architettura',
-           '/pdf/capitolo1_mario_rossi.pdf',
-           'Buona prima stesura, aggiungere dettagli sui DAO.',
-           'IN_REVISIONE'
-       );
+-- Nessun dato di test qui: i capitoli si caricano da "Gestione Revisioni"
+-- così il campo pdf_data viene popolato con un PDF reale.
 
 -- ==========================================
 -- 5. NOTIFICHE (Dati di prova)

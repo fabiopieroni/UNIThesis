@@ -22,6 +22,7 @@ import model.Utente;
 
 import java.awt.Desktop;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -76,7 +77,6 @@ public class GestioneRevisioniProfFXController {
                 comboStato.setValue(null);
             }
         });
-
     }
 
     public void mostraTutte() {
@@ -159,17 +159,24 @@ public class GestioneRevisioniProfFXController {
     @FXML
     void apriPdf(ActionEvent event) {
         RevisioneCapitolo selezionata = tabellaRevisioni.getSelectionModel().getSelectedItem();
-        if (selezionata == null || selezionata.getPercorsoPdf() == null) {
+        if (selezionata == null) {
             mostraErrore("Seleziona prima un capitolo dalla tabella.");
             return;
         }
-        File file = new File(selezionata.getPercorsoPdf());
-        if (!file.exists()) {
-            mostraErrore("File non trovato sul disco: " + selezionata.getPercorsoPdf());
+
+        byte[] pdfBytes = gestioneRevisioni.getPdfData(selezionata.getIdRevisione());
+        if (pdfBytes == null || pdfBytes.length == 0) {
+            mostraErrore("Nessun file PDF disponibile per questo capitolo.");
             return;
         }
+
         try {
-            Desktop.getDesktop().open(file);
+            File tempFile = File.createTempFile("capitolo_" + selezionata.getIdRevisione() + "_", ".pdf");
+            tempFile.deleteOnExit();
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(pdfBytes);
+            }
+            Desktop.getDesktop().open(tempFile);
         } catch (IOException e) {
             mostraErrore("Impossibile aprire il file: " + e.getMessage());
         }

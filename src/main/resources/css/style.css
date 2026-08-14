@@ -1,0 +1,7 @@
+.watermark-label {
+    -fx-font-size: 160px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(26, 62, 140, 0.8);
+    -fx-font-family: "Segoe UI Semibold", "Segoe UI", Arial, sans-serif;
+    -fx-rotate: 0;
+}

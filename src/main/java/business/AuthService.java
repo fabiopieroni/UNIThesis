@@ -11,6 +11,11 @@ public class AuthService {
         this.utenteDAO = new UtenteDAOimpl();
     }
 
+    // Costruttore usato SOLO per i test, per iniettare un DAO finto (mock)
+    public AuthService(UtenteDAO utenteDAO) {
+        this.utenteDAO = utenteDAO;
+    }
+
     public boolean login(String email, String password) {
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             return false;

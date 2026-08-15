@@ -83,6 +83,12 @@ public class Tesi {
         case "DISPONIBILE":
           this.statoOggetto = new PubblicataState();
           break;
+        case "CONSEGNATA":
+          this.statoOggetto = new ConsegnataState();
+          break;
+        case "ACCETTATA":
+          this.statoOggetto = new AccettataState();
+          break;
         default:
           this.statoOggetto = new BozzaState();
           break;

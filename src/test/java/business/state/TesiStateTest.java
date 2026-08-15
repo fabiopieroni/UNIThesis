@@ -48,7 +48,6 @@ class TesiStateTest {
 
   @Test
   void inCorso_nonPiuCandidabile_assegnaLanciaEccezione() {
-    // Una tesi già IN_CORSO non è più candidabile: una nuova assegnazione deve fallire
     Tesi tesi = new Tesi();
     tesi.setStatoOggetto(new InCorsoState());
 
@@ -61,7 +60,6 @@ class TesiStateTest {
 
   @Test
   void pubblicata_candidabile_assegnaTransizionaInCorso() {
-    // Una tesi PUBBLICATA è candidabile: assegna() deve avere successo
     Tesi tesi = new Tesi();
     tesi.setStatoOggetto(new PubblicataState());
 
@@ -79,6 +77,46 @@ class TesiStateTest {
   }
 
   // ================================
+  // STATO: CONSEGNATA
+  // ================================
+
+  @Test
+  void consegnata_pubblica_lanciaEccezione() {
+    Tesi tesi = new Tesi();
+    tesi.setStatoOggetto(new ConsegnataState());
+
+    assertThrows(TransizioneNonValidaException.class, tesi::pubblica);
+  }
+
+  @Test
+  void consegnata_assegna_lanciaEccezione() {
+    Tesi tesi = new Tesi();
+    tesi.setStatoOggetto(new ConsegnataState());
+
+    assertThrows(TransizioneNonValidaException.class, tesi::assegna);
+  }
+
+  // ================================
+  // STATO: ACCETTATA
+  // ================================
+
+  @Test
+  void accettata_pubblica_lanciaEccezione() {
+    Tesi tesi = new Tesi();
+    tesi.setStatoOggetto(new AccettataState());
+
+    assertThrows(TransizioneNonValidaException.class, tesi::pubblica);
+  }
+
+  @Test
+  void accettata_assegna_lanciaEccezione() {
+    Tesi tesi = new Tesi();
+    tesi.setStatoOggetto(new AccettataState());
+
+    assertThrows(TransizioneNonValidaException.class, tesi::assegna);
+  }
+
+  // ================================
   // VERIFICA NOMI STATO
   // ================================
 
@@ -87,6 +125,8 @@ class TesiStateTest {
     assertEquals("BOZZA", new BozzaState().getNomeStato());
     assertEquals("IN_CORSO", new InCorsoState().getNomeStato());
     assertEquals("PUBBLICATA", new PubblicataState().getNomeStato());
+    assertEquals("CONSEGNATA", new ConsegnataState().getNomeStato());
+    assertEquals("ACCETTATA", new AccettataState().getNomeStato());
   }
 
   // ================================
@@ -101,23 +141,25 @@ class TesiStateTest {
     assertTrue(tesi.getStatoOggetto() instanceof BozzaState);
   }
 
+  // ================================
+  // setStato() CON CONSEGNATA / ACCETTATA
+  // ================================
+
   @Test
-  void setStato_consegnata_cadeNelDefaultBozza_documentaComportamento() {
-    // CASO LIMITE da discutere col gruppo: "CONSEGNATA" non è gestita nello
-    // switch di Tesi.setStato(), quindi cade nel ramo default e diventa BozzaState.
-    // Questo test documenta il comportamento ATTUALE, non necessariamente quello corretto.
+  void setStato_consegnata_usaConsegnataState() {
     Tesi tesi = new Tesi();
     tesi.setStato("CONSEGNATA");
 
-    assertTrue(tesi.getStatoOggetto() instanceof BozzaState);
+    assertTrue(tesi.getStatoOggetto() instanceof ConsegnataState);
+    assertEquals("CONSEGNATA", tesi.getStatoOggetto().getNomeStato());
   }
 
   @Test
-  void setStato_accettata_cadeNelDefaultBozza_documentaComportamento() {
-    // Stesso caso limite di "CONSEGNATA": "ACCETTATA" non gestita, finisce in BozzaState.
+  void setStato_accettata_usaAccettataState() {
     Tesi tesi = new Tesi();
     tesi.setStato("ACCETTATA");
 
-    assertTrue(tesi.getStatoOggetto() instanceof BozzaState);
+    assertTrue(tesi.getStatoOggetto() instanceof AccettataState);
+    assertEquals("ACCETTATA", tesi.getStatoOggetto().getNomeStato());
   }
 }

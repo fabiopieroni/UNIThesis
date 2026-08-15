@@ -1,6 +1,7 @@
 package business.state;
 
 import model.Tesi;
+import business.exception.TransizioneNonValidaException;
 
 public class InCorsoState implements TesiState {
 
@@ -12,7 +13,7 @@ public class InCorsoState implements TesiState {
 
   @Override
   public void assegna(Tesi tesi) {
-    System.out.println("⚠️ La tesi è già in corso.");
+    throw new TransizioneNonValidaException("La tesi è già in corso, non può essere assegnata di nuovo.");
   }
 
   @Override

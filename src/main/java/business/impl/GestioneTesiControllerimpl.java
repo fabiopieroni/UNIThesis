@@ -5,12 +5,21 @@ import dao.TesiDAO;
 import dao.impl.TesiDAOimpl;
 import model.Tesi;
 import model.TesiConDettagli;
-
+import business.exception.TransizioneNonValidaException;
 import java.util.List;
+import business.state.BozzaState;
 
 public class GestioneTesiControllerimpl implements GestioneTesiController {
 
-  private final TesiDAO tesiDAO = new TesiDAOimpl();
+  private final TesiDAO tesiDAO;
+
+  public GestioneTesiControllerimpl() {
+    this.tesiDAO = new TesiDAOimpl();
+  }
+
+  public GestioneTesiControllerimpl(TesiDAO tesiDAO) {
+    this.tesiDAO = tesiDAO;
+  }
 
   @Override
   public List<Tesi> getTesiDisponibili() {
@@ -25,12 +34,20 @@ public class GestioneTesiControllerimpl implements GestioneTesiController {
 
   @Override
   public boolean modificaTesi(Tesi tesi) {
+    if (!(tesi.getStatoOggetto() instanceof BozzaState)) {
+      return false;
+    }
     return tesiDAO.aggiornaTesi(tesi);
   }
 
   @Override
   public boolean pubblicaTesi(Tesi tesi) {
-    tesi.pubblica();
+    try {
+      tesi.pubblica();
+    } catch (TransizioneNonValidaException e) {
+      System.err.println("Errore: " + e.getMessage());
+      return false;
+    }
     return tesiDAO.aggiornaTesi(tesi);
   }
 

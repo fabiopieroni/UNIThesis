@@ -19,6 +19,11 @@ public class GestioneUtentiControllerimpl implements GestioneUtentiController {
         this.utenteDAO = new UtenteDAOimpl();
     }
 
+    // Costruttore usato SOLO per i test, per iniettare un DAO finto (mock)
+    public GestioneUtentiControllerimpl(UtenteDAO utenteDAO) {
+        this.utenteDAO = utenteDAO;
+    }
+
     @Override
     public List<Utente> getTuttiUtenti() {
         return utenteDAO.trovaTutti();

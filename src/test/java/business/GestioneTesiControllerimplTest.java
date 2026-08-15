@@ -103,5 +103,85 @@ class GestioneTesiControllerimplTest {
   }
 
   // ===== SEZIONE TOMMY: consegna / archiviazione =====
-  // (da completare)
+
+  @Test
+  void consegnaTesi_daInCorso_passaAConsegnata() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "IN_CORSO", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+    when(tesiDAO.aggiornaStato(1, "CONSEGNATA")).thenReturn(true);
+
+    boolean risultato = controller.consegnaTesi(1);
+
+    assertTrue(risultato);
+    verify(tesiDAO, times(1)).aggiornaStato(1, "CONSEGNATA");
+  }
+
+  @Test
+  void consegnaTesi_nonInCorso_fallisce() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "PUBBLICATA", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+
+    boolean risultato = controller.consegnaTesi(1);
+
+    assertFalse(risultato);
+    verify(tesiDAO, never()).aggiornaStato(anyInt(), anyString());
+  }
+
+  @Test
+  void accettaTesiFinale_daConsegnata_passaAAccettata() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "CONSEGNATA", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+    when(tesiDAO.aggiornaStato(1, "ACCETTATA")).thenReturn(true);
+
+    boolean risultato = controller.accettaTesiFinale(1);
+
+    assertTrue(risultato);
+    verify(tesiDAO, times(1)).aggiornaStato(1, "ACCETTATA");
+  }
+
+  @Test
+  void accettaTesiFinale_nonConsegnata_fallisce() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "IN_CORSO", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+
+    boolean risultato = controller.accettaTesiFinale(1);
+
+    assertFalse(risultato);
+    verify(tesiDAO, never()).aggiornaStato(anyInt(), anyString());
+  }
+
+  @Test
+  void rifiutaTesiFinale_daConsegnata_tornaAInCorso() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "CONSEGNATA", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+    when(tesiDAO.aggiornaStato(1, "IN_CORSO")).thenReturn(true);
+
+    boolean risultato = controller.rifiutaTesiFinale(1);
+
+    assertTrue(risultato);
+    verify(tesiDAO, times(1)).aggiornaStato(1, "IN_CORSO");
+  }
+
+  @Test
+  void archiviaTesi_daAccettata_passaAArchiviata() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "ACCETTATA", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+    when(tesiDAO.aggiornaStato(1, "ARCHIVIATA")).thenReturn(true);
+
+    boolean risultato = controller.archiviaTesi(1);
+
+    assertTrue(risultato);
+    verify(tesiDAO, times(1)).aggiornaStato(1, "ARCHIVIATA");
+  }
+
+  @Test
+  void archiviaTesi_nonAccettata_fallisce() {
+    Tesi tesi = new Tesi(1, "Titolo", "descrizione", "Informatica", "CONSEGNATA", 1);
+    when(tesiDAO.getTesiById(1)).thenReturn(tesi);
+
+    boolean risultato = controller.archiviaTesi(1);
+
+    assertFalse(risultato);
+    verify(tesiDAO, never()).aggiornaStato(anyInt(), anyString());
+  }
 }

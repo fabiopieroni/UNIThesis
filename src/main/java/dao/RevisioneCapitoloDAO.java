@@ -9,4 +9,5 @@ public interface RevisioneCapitoloDAO {
     boolean aggiornaStatoENote(int idRevisione, String stato, String note);
     boolean rinviaCorrezione(int idRevisione, String nomeFile, byte[] pdfData);
     byte[] getPdfData(int idRevisione);
+    RevisioneCapitolo getById(int idRevisione);
 }

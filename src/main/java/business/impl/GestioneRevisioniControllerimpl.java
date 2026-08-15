@@ -21,10 +21,13 @@ public class GestioneRevisioniControllerimpl implements GestioneRevisioniControl
     private final TesiDAO tesiDAO;
 
     public GestioneRevisioniControllerimpl() {
-        this.revisioneDAO = new RevisioneCapitoloDAOimpl();
-        this.tesiDAO = new TesiDAOimpl();
-
+        this(new RevisioneCapitoloDAOimpl(), new TesiDAOimpl());
         aggiungiObserver(new GestoreNotifiche());
+    }
+
+    public GestioneRevisioniControllerimpl(RevisioneCapitoloDAO revisioneDAO, TesiDAO tesiDAO) {
+        this.revisioneDAO = revisioneDAO;
+        this.tesiDAO = tesiDAO;
     }
 
     @Override
@@ -48,18 +51,19 @@ public class GestioneRevisioniControllerimpl implements GestioneRevisioniControl
 
     @Override
     public boolean inviaRevisione(RevisioneCapitolo revisione) {
+        Tesi tesi = tesiDAO.getTesiById(revisione.getIdTesi());
+        if (tesi == null || !"IN_CORSO".equals(tesi.getStato())) {
+            return false;
+        }
+
         boolean successo = revisioneDAO.salva(revisione);
 
         if (successo) {
-            Tesi tesi = tesiDAO.getTesiById(revisione.getIdTesi());
+            int idProfessore = tesi.getIdProfessore();
+            String messaggio = "Nuova revisione caricata per il Capitolo " + revisione.getNumCapitolo()
+                    + " della tesi ID: " + tesi.getIdTesi();
 
-            if (tesi != null) {
-                int idProfessore = tesi.getIdProfessore();
-                String messaggio = "Nuova revisione caricata per il Capitolo " + revisione.getNumCapitolo()
-                        + " della tesi ID: " + tesi.getIdTesi();
-
-                notificaObservers(messaggio, idProfessore);
-            }
+            notificaObservers(messaggio, idProfessore);
         }
         return successo;
     }
@@ -70,12 +74,29 @@ public class GestioneRevisioniControllerimpl implements GestioneRevisioniControl
     }
 
     @Override
+    public RevisioneCapitolo getById(int idRevisione) {
+        return revisioneDAO.getById(idRevisione);
+    }
+
+    @Override
     public boolean aggiornaStatoRevisione(int idRevisione, String nuovoStato, String note) {
+        RevisioneCapitolo capitolo = revisioneDAO.getById(idRevisione);
+        if (capitolo == null) {
+            return false;
+        }
+        Tesi tesi = tesiDAO.getTesiById(capitolo.getIdTesi());
+        if (tesi != null && "ACCETTATA".equals(tesi.getStato())) {
+            return false;
+        }
         return revisioneDAO.aggiornaStatoENote(idRevisione, nuovoStato, note);
     }
 
     @Override
     public boolean rinviaCorrezione(int idRevisione, String nomeFile, byte[] pdfData) {
+        RevisioneCapitolo capitolo = revisioneDAO.getById(idRevisione);
+        if (capitolo == null || !"DA_CORREGGERE".equals(capitolo.getStatoRevisione())) {
+            return false;
+        }
         return revisioneDAO.rinviaCorrezione(idRevisione, nomeFile, pdfData);
     }
 

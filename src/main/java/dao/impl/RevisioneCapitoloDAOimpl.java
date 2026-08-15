@@ -116,4 +116,32 @@ public class RevisioneCapitoloDAOimpl implements RevisioneCapitoloDAO {
         }
         return null;
     }
+    @Override
+    public RevisioneCapitolo getById(int idRevisione) {
+        String query = "SELECT id_revisione, id_tesi, num_capitolo, titolo_capitolo, percorso_pdf, " +
+                "note_professore, stato_revisione, data_invio " +
+                "FROM revisioni_capitoli WHERE id_revisione = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setInt(1, idRevisione);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    RevisioneCapitolo r = new RevisioneCapitolo();
+                    r.setIdRevisione(rs.getInt("id_revisione"));
+                    r.setIdTesi(rs.getInt("id_tesi"));
+                    r.setNumCapitolo(rs.getInt("num_capitolo"));
+                    r.setTitoloCapitolo(rs.getString("titolo_capitolo"));
+                    r.setPercorsoPdf(rs.getString("percorso_pdf"));
+                    r.setNoteProfessore(rs.getString("note_professore"));
+                    r.setStatoRevisione(rs.getString("stato_revisione"));
+                    r.setDataInvio(rs.getTimestamp("data_invio"));
+                    return r;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
